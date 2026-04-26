@@ -28,3 +28,6 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Production smoke test
+        run: npm run smoke:prod

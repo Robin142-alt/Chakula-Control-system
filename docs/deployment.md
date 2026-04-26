@@ -23,6 +23,8 @@ That makes Railway the fastest production path for this repo.
 5. After the first deploy, run the schema and seed commands once from a Railway shell:
    - `npm run db:migrate`
    - `npm run db:seed`
+6. Run the production smoke test locally before promoting the service:
+   - `npm run smoke:prod`
 
 ## Railway config in this repo
 
@@ -35,6 +37,27 @@ For a no-database walkthrough or stakeholder demo, set:
 - `APP_DATA_MODE=demo`
 
 This serves the app and API from the built-in seven-day dataset. It is useful for presentations, screenshots, and local QA when the live database is unavailable.
+
+You can start this quickly with:
+
+```bash
+npm run build
+npm run start:demo
+```
+
+## Docker path
+
+This repo now includes:
+
+- [Dockerfile](../Dockerfile)
+- [.dockerignore](../.dockerignore)
+
+Build and run locally:
+
+```bash
+docker build -t chakula-control .
+docker run --rm -p 3000:3000 -e APP_DATA_MODE=demo chakula-control
+```
 
 ## Vercel guidance
 
@@ -66,6 +89,10 @@ That aligns with the current Vercel deployment guidance for prebuilt CI pipeline
 - Confirm Neon connection string is set in `DATABASE_URL`
 - Run `npm run db:migrate`
 - Seed only if you want demo data: `npm run db:seed`
+- Run `npm test`
+- Run `npm run smoke:prod`
 - Verify `/api/health`
 - Verify offline install on one low-end Android device
 - Verify service worker caches the app shell after first load
+
+See the fuller checklist in [production-launch-checklist.md](production-launch-checklist.md).

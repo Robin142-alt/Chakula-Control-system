@@ -77,6 +77,12 @@ If Playwright cannot find Microsoft Edge on your machine, install Chromium once:
 npx playwright install chromium
 ```
 
+Run a production-style smoke test against the built app in demo mode:
+
+```bash
+npm run smoke:prod
+```
+
 ## Environment
 
 Use `.env.example` as the template. The real local `.env` uses:
@@ -102,6 +108,7 @@ For an API and UI walkthrough without a live database, you can also run with:
 - Frontend app shell: [src/App.jsx](src/App.jsx)
 - Simulated output: [docs/simulated-dashboard-output.json](docs/simulated-dashboard-output.json)
 - Deployment notes: [docs/deployment.md](docs/deployment.md)
+- Production checklist: [docs/production-launch-checklist.md](docs/production-launch-checklist.md)
 - Demo flow: [docs/demo-flow.md](docs/demo-flow.md)
 - Pitch script: [docs/pitch-script.md](docs/pitch-script.md)
 - Final validation: [docs/final-validation.md](docs/final-validation.md)

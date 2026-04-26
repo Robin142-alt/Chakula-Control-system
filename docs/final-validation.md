@@ -8,6 +8,7 @@ Executed successfully:
 - `npm run db:seed`
 - `npm test`
 - `npm run build`
+- `npm run smoke:prod`
 - `npm run demo:screenshots`
 
 Checked API responses successfully:
@@ -33,6 +34,11 @@ Generated demo screenshots successfully:
 Browser automation fallback note:
 
 - The `agent-browser` CLI was not available in this environment, so UI verification used HTTP-level checks after a successful build.
+
+Container verification note:
+
+- `Dockerfile` and `.dockerignore` were added for production portability.
+- Docker itself was not installed in this environment, so image build verification could not be run here.
 
 ## Requirement checklist
 
