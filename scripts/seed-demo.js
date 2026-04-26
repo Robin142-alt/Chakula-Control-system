@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { buildInventorySnapshot } from "../data/derivedData.js";
 import { pool } from "../server/db.js";
 import { DEMO_DATA } from "../data/demoData.js";
 import {
@@ -230,38 +231,13 @@ function buildAlertRows() {
   return generatedAlerts;
 }
 
-function buildInventorySnapshot() {
-  const issueLogs = [...DEMO_DATA.issue_logs].sort((left, right) => String(left.date_time).localeCompare(String(right.date_time)));
-  const latestCountsByItem = new Map();
-
-  [...DEMO_DATA.stock_counts]
-    .sort((left, right) => String(left.date_time).localeCompare(String(right.date_time)))
-    .forEach((count) => {
-      latestCountsByItem.set(count.item_id, count);
-    });
-
-  return DEMO_DATA.inventory_items.map((item) => {
-    const latestCount = latestCountsByItem.get(item.id);
-    const issuesAfterCount = issueLogs
-      .filter((issue) => issue.item_id === item.id && (!latestCount || issue.date_time > latestCount.date_time))
-      .reduce((total, issue) => total + (issue.quantity || 0), 0);
-
-    return {
-      ...item,
-      current_stock: latestCount
-        ? roundValue((latestCount.counted_quantity || 0) - issuesAfterCount)
-        : roundValue((item.current_stock || 0) - issuesAfterCount),
-    };
-  });
-}
-
 const client = await pool.connect();
 
 try {
   await client.query("BEGIN");
   await client.query("TRUNCATE activity_logs, cost_tracking, alerts, stock_counts, leftover_logs, issue_logs, stock_transactions, expected_usage, student_counts, inventory_items, users RESTART IDENTITY");
 
-  const inventorySnapshot = buildInventorySnapshot();
+  const inventorySnapshot = buildInventorySnapshot(DEMO_DATA);
   const alertRows = buildAlertRows();
   const costRows = buildCostTrackingRows({
     ...DEMO_DATA,

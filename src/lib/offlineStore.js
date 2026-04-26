@@ -1,4 +1,5 @@
 import { openDB } from "idb";
+import { buildInventorySnapshot } from "../../data/derivedData.js";
 import { DEMO_DATA, USERS } from "../../data/demoData.js";
 import {
   buildDailySummaries,
@@ -32,39 +33,6 @@ function getApiBaseUrl() {
 
 function sortByDateTime(records) {
   return [...records].sort((left, right) => String(left.date_time).localeCompare(String(right.date_time)));
-}
-
-function buildInventorySnapshot(dataset) {
-  const latestCounts = new Map();
-
-  dataset.stock_counts
-    .slice()
-    .sort((left, right) => String(left.date_time).localeCompare(String(right.date_time)))
-    .forEach((count) => {
-      latestCounts.set(count.item_id, count);
-    });
-
-  return dataset.inventory_items.map((item) => {
-    const latestCount = latestCounts.get(item.id);
-    const issuesAfterCount = dataset.issue_logs
-      .filter((issue) => issue.item_id === item.id && (!latestCount || issue.date_time > latestCount.date_time))
-      .reduce((total, issue) => total + safeNumber(issue.quantity), 0);
-    const current_stock =
-      latestCount?.counted_quantity !== undefined
-        ? roundValue(safeNumber(latestCount.counted_quantity) - issuesAfterCount)
-        : roundValue(safeNumber(item.current_stock) - issuesAfterCount);
-
-    return {
-      ...item,
-      current_stock,
-      status:
-        current_stock <= safeNumber(item.reorder_level)
-          ? "Low"
-          : current_stock <= safeNumber(item.reorder_level) * 1.5
-            ? "Watch"
-            : "Healthy",
-    };
-  });
 }
 
 function createLocalWarnings(record) {

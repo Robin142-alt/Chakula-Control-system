@@ -234,7 +234,7 @@ export function detectAnomaliesFromRecords({
   });
 
   const dateMealPairs = new Set();
-  issues.forEach((record) => {
+  normalizedIssues.forEach((record) => {
     dateMealPairs.add(`${toDateKey(record.date_time)}|${normalizeMealType(record.meal_type)}`);
   });
 

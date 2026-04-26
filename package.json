@@ -9,9 +9,12 @@
     "dev:web": "node ./node_modules/vite/bin/vite.js --host 0.0.0.0",
     "build": "node ./node_modules/vite/bin/vite.js build",
     "start": "node server/index.js",
+    "test": "node --test tests/**/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage tests/**/*.test.js",
     "db:migrate": "node scripts/run-sql.js db/schema.sql",
     "db:seed": "node scripts/seed-demo.js",
-    "db:setup": "npm run db:migrate && npm run db:seed"
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "demo:screenshots": "node scripts/capture-screenshots.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -25,6 +28,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
+    "playwright": "^1.54.2",
     "vite": "^5.4.11"
   }
 }

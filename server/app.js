@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import { appendFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { getDemoDataset } from "../data/derivedData.js";
 import { DEMO_DATA, ROLE_ACCESS, USERS } from "../data/demoData.js";
 import {
   buildCostTrackingRows,
@@ -22,6 +23,7 @@ import { pool, withTransaction } from "./db.js";
 
 const app = express();
 const fallbackPath = resolve(process.cwd(), "data", "server-ingest-fallback.jsonl");
+const dataMode = process.env.APP_DATA_MODE === "demo" ? "demo" : "database";
 
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
@@ -141,6 +143,10 @@ async function getInventoryItems(client) {
 }
 
 async function fetchDataset(dateFrom, dateTo) {
+  if (dataMode === "demo") {
+    return getDemoDataset(dateFrom, dateTo);
+  }
+
   const filters = [];
   const params = [];
   if (dateFrom) {
@@ -734,12 +740,23 @@ app.get("/api/reports", async (req, res) => {
 });
 
 app.get("/api/health", async (_req, res) => {
+  if (dataMode === "demo") {
+    return res.json({
+      success: true,
+      warnings: [],
+      database_time: null,
+      demo_inventory_count: DEMO_DATA.inventory_items.length,
+      data_mode: "demo",
+    });
+  }
+
   const result = await pool.query("SELECT NOW() AS current_time");
   return res.json({
     success: true,
     warnings: [],
     database_time: result.rows[0]?.current_time,
     demo_inventory_count: DEMO_DATA.inventory_items.length,
+    data_mode: "database",
   });
 });
 

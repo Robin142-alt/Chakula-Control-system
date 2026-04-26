@@ -49,6 +49,34 @@ npm run dev:web
 npm run build
 ```
 
+## Testing
+
+Run the logic and API test suite:
+
+```bash
+npm test
+```
+
+Generate coverage with Node's built-in coverage runner:
+
+```bash
+npm run test:coverage
+```
+
+## Demo assets
+
+Generate the mobile screenshots used in the presentation docs:
+
+```bash
+npm run demo:screenshots
+```
+
+If Playwright cannot find Microsoft Edge on your machine, install Chromium once:
+
+```bash
+npx playwright install chromium
+```
+
 ## Environment
 
 Use `.env.example` as the template. The real local `.env` uses:
@@ -59,15 +87,24 @@ Use `.env.example` as the template. The real local `.env` uses:
 
 Credentials are not hardcoded in source files.
 
+For an API and UI walkthrough without a live database, you can also run with:
+
+- `APP_DATA_MODE=demo`
+
 ## Core files
 
-- SQL schema: [db/schema.sql](/C:/Users/user/Desktop/PROJECTS/Kitchen%20Accountability%20&%20Food%20Cost%20Control%20System/db/schema.sql)
-- Demo data: [data/demoData.js](/C:/Users/user/Desktop/PROJECTS/Kitchen%20Accountability%20&%20Food%20Cost%20Control%20System/data/demoData.js)
-- Core logic: [data/logic.js](/C:/Users/user/Desktop/PROJECTS/Kitchen%20Accountability%20&%20Food%20Cost%20Control%20System/data/logic.js)
-- Backend API: [server/app.js](/C:/Users/user/Desktop/PROJECTS/Kitchen%20Accountability%20&%20Food%20Cost%20Control%20System/server/app.js)
-- Local-first storage and sync: [src/lib/offlineStore.js](/C:/Users/user/Desktop/PROJECTS/Kitchen%20Accountability%20&%20Food%20Cost%20Control%20System/src/lib/offlineStore.js)
-- Frontend app shell: [src/App.jsx](/C:/Users/user/Desktop/PROJECTS/Kitchen%20Accountability%20&%20Food%20Cost%20Control%20System/src/App.jsx)
-- Simulated output: [docs/simulated-dashboard-output.json](/C:/Users/user/Desktop/PROJECTS/Kitchen%20Accountability%20&%20Food%20Cost%20Control%20System/docs/simulated-dashboard-output.json)
+- SQL schema: [db/schema.sql](db/schema.sql)
+- Demo data: [data/demoData.js](data/demoData.js)
+- Derived dataset helpers: [data/derivedData.js](data/derivedData.js)
+- Core logic: [data/logic.js](data/logic.js)
+- Backend API: [server/app.js](server/app.js)
+- Local-first storage and sync: [src/lib/offlineStore.js](src/lib/offlineStore.js)
+- Frontend app shell: [src/App.jsx](src/App.jsx)
+- Simulated output: [docs/simulated-dashboard-output.json](docs/simulated-dashboard-output.json)
+- Deployment notes: [docs/deployment.md](docs/deployment.md)
+- Demo flow: [docs/demo-flow.md](docs/demo-flow.md)
+- Pitch script: [docs/pitch-script.md](docs/pitch-script.md)
+- Final validation: [docs/final-validation.md](docs/final-validation.md)
 
 ## Required API routes
 
@@ -113,5 +150,4 @@ All write endpoints return:
 ## Notes
 
 - The npm scripts use direct Node execution for Vite because this workspace path contains `&`, which breaks the default Windows shim in some environments.
-- If you want, I can also package the next step: commit these changes and prepare the repo for push/PR.
-
+- CI is configured in `.github/workflows/ci.yml` to run `npm test` and `npm run build` on pushes and pull requests.

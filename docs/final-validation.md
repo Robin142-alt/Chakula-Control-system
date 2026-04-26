@@ -6,7 +6,9 @@ Executed successfully:
 
 - `npm run db:migrate`
 - `npm run db:seed`
+- `npm test`
 - `npm run build`
+- `npm run demo:screenshots`
 
 Checked API responses successfully:
 
@@ -20,6 +22,13 @@ Checked frontend shell successfully:
 - Vite app root served `200`
 - Manifest served `200`
 - Root HTML contained `id="root"` and `Chakula Control`
+
+Generated demo screenshots successfully:
+
+- `docs/screenshots/01-storekeeper-dashboard.png`
+- `docs/screenshots/02-issue-stock.png`
+- `docs/screenshots/03-cook-leftovers.png`
+- `docs/screenshots/04-principal-view.png`
 
 Browser automation fallback note:
 
@@ -83,4 +92,3 @@ Browser automation fallback note:
     - Cooking oil variance detected
     - Beans variance detected
     - Lunch consumption out of range
-
