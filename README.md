@@ -83,6 +83,12 @@ Run a production-style smoke test against the built app in demo mode:
 npm run smoke:prod
 ```
 
+Check liveness and readiness against a running server:
+
+```bash
+npm run runtime:check -- http://127.0.0.1:3000
+```
+
 ## Environment
 
 Use `.env.example` as the template. The real local `.env` uses:

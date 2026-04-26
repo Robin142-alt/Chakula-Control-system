@@ -19,7 +19,8 @@ import {
   sortAlerts,
   toDateKey,
 } from "../data/logic.js";
-import { pool, withTransaction } from "./db.js";
+import { queryDb, withTransaction } from "./db.js";
+import { getRuntimeStatus } from "./runtime.js";
 
 const app = express();
 const fallbackPath = resolve(process.cwd(), "data", "server-ingest-fallback.jsonl");
@@ -27,6 +28,12 @@ const dataMode = process.env.APP_DATA_MODE === "demo" ? "demo" : "database";
 
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
+
+function asyncHandler(handler) {
+  return (req, res, next) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+}
 
 function defaultWarnings() {
   return [];
@@ -160,13 +167,13 @@ async function fetchDataset(dateFrom, dateTo) {
 
   const whereClause = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
   const [issues, leftovers, counts, expected, students, inventory, storedAlerts] = await Promise.all([
-    pool.query(`SELECT * FROM issue_logs ${whereClause} ORDER BY date_time`, params),
-    pool.query(`SELECT * FROM leftover_logs ${whereClause} ORDER BY date_time`, params),
-    pool.query(`SELECT * FROM stock_counts ${whereClause} ORDER BY date_time`, params),
-    pool.query(`SELECT * FROM expected_usage ${whereClause} ORDER BY date_time`, params),
-    pool.query(`SELECT * FROM student_counts ${whereClause} ORDER BY date_time`, params),
-    pool.query("SELECT * FROM inventory_items ORDER BY id"),
-    pool.query(`SELECT * FROM alerts ${whereClause} ORDER BY date_time DESC`, params),
+    queryDb(`SELECT * FROM issue_logs ${whereClause} ORDER BY date_time`, params),
+    queryDb(`SELECT * FROM leftover_logs ${whereClause} ORDER BY date_time`, params),
+    queryDb(`SELECT * FROM stock_counts ${whereClause} ORDER BY date_time`, params),
+    queryDb(`SELECT * FROM expected_usage ${whereClause} ORDER BY date_time`, params),
+    queryDb(`SELECT * FROM student_counts ${whereClause} ORDER BY date_time`, params),
+    queryDb("SELECT * FROM inventory_items ORDER BY id"),
+    queryDb(`SELECT * FROM alerts ${whereClause} ORDER BY date_time DESC`, params),
   ]);
 
   return {
@@ -284,6 +291,15 @@ async function handleReadOnlyAttempt(endpoint, payload, warnings) {
   });
 }
 
+async function safelyHandleReadOnlyAttempt(endpoint, payload, warnings) {
+  try {
+    await handleReadOnlyAttempt(endpoint, payload, warnings);
+  } catch (error) {
+    addWarning(warnings, "audit_log_deferred", "Audit save failed, so the attempt was written to the fallback queue.");
+    await appendFallback(`${endpoint}-role-attempt`, payload, warnings, error.message);
+  }
+}
+
 app.post("/api/issue-stock", async (req, res) => {
   const payload = {
     item_id: req.body.item_id ?? null,
@@ -301,7 +317,7 @@ app.post("/api/issue-stock", async (req, res) => {
 
   if (!isInputRoleAllowed("issue-stock", actorRole)) {
     addWarning(warnings, "role_warning", "Only the storekeeper can issue stock. The attempt was saved in the audit trail.");
-    await handleReadOnlyAttempt("issue-stock", { ...payload, actor_role: actorRole }, warnings);
+    await safelyHandleReadOnlyAttempt("issue-stock", { ...payload, actor_role: actorRole }, warnings);
     return res.json({ success: true, warnings });
   }
 
@@ -436,7 +452,7 @@ app.post("/api/log-leftover", async (req, res) => {
 
   if (!isInputRoleAllowed("log-leftover", actorRole)) {
     addWarning(warnings, "role_warning", "Only the cook can log leftovers. The attempt was saved in the audit trail.");
-    await handleReadOnlyAttempt("log-leftover", { ...payload, actor_role: actorRole }, warnings);
+    await safelyHandleReadOnlyAttempt("log-leftover", { ...payload, actor_role: actorRole }, warnings);
     return res.json({ success: true, warnings });
   }
 
@@ -539,7 +555,7 @@ app.post("/api/stock-count", async (req, res) => {
 
   if (!isInputRoleAllowed("stock-count", actorRole)) {
     addWarning(warnings, "role_warning", "Only the storekeeper can perform stock counts. The attempt was saved in the audit trail.");
-    await handleReadOnlyAttempt("stock-count", { ...payload, actor_role: actorRole }, warnings);
+    await safelyHandleReadOnlyAttempt("stock-count", { ...payload, actor_role: actorRole }, warnings);
     return res.json({ success: true, warnings });
   }
 
@@ -647,7 +663,7 @@ app.post("/api/stock-count", async (req, res) => {
   }
 });
 
-app.get("/api/dashboard-summary", async (req, res) => {
+app.get("/api/dashboard-summary", asyncHandler(async (req, res) => {
   const date = req.query.date || "2026-04-26";
   const role = normalizeRole(req.query.role || "STOREKEEPER");
   const dataset = await fetchDataset(subtractDays(date, 6), date);
@@ -676,9 +692,9 @@ app.get("/api/dashboard-summary", async (req, res) => {
       quick_actions: ROLE_ACCESS[role] || [],
     },
   });
-});
+}));
 
-app.get("/api/alerts", async (req, res) => {
+app.get("/api/alerts", asyncHandler(async (req, res) => {
   const role = normalizeRole(req.query.role || "STOREKEEPER");
   const dataset = await fetchDataset(req.query.startDate || "2026-04-20", req.query.endDate || "2026-04-26");
   const derivedAlerts = detectAnomaliesFromRecords(dataset);
@@ -693,9 +709,9 @@ app.get("/api/alerts", async (req, res) => {
     warnings: [],
     alerts: filtered,
   });
-});
+}));
 
-app.get("/api/reports", async (req, res) => {
+app.get("/api/reports", asyncHandler(async (req, res) => {
   const startDate = req.query.startDate || "2026-04-20";
   const endDate = req.query.endDate || "2026-04-26";
   const dataset = await fetchDataset(startDate, endDate);
@@ -737,26 +753,45 @@ app.get("/api/reports", async (req, res) => {
       ],
     },
   });
-});
+}));
 
-app.get("/api/health", async (_req, res) => {
-  if (dataMode === "demo") {
-    return res.json({
-      success: true,
-      warnings: [],
-      database_time: null,
-      demo_inventory_count: DEMO_DATA.inventory_items.length,
-      data_mode: "demo",
-    });
-  }
-
-  const result = await pool.query("SELECT NOW() AS current_time");
+app.get("/api/health", asyncHandler(async (_req, res) => {
+  const runtimeStatus = await getRuntimeStatus({ includeDatabasePing: false, dataMode });
   return res.json({
     success: true,
-    warnings: [],
-    database_time: result.rows[0]?.current_time,
+    warnings: runtimeStatus.warnings,
+    database_time: null,
     demo_inventory_count: DEMO_DATA.inventory_items.length,
-    data_mode: "database",
+    data_mode: dataMode,
+    runtime: runtimeStatus,
+  });
+}));
+
+app.get("/api/readiness", asyncHandler(async (_req, res) => {
+  const runtimeStatus = await getRuntimeStatus({ includeDatabasePing: true, dataMode });
+  const statusCode = runtimeStatus.ready ? 200 : 503;
+
+  return res.status(statusCode).json({
+    success: runtimeStatus.ready,
+    warnings: runtimeStatus.warnings,
+    demo_inventory_count: DEMO_DATA.inventory_items.length,
+    data_mode: dataMode,
+    runtime: runtimeStatus,
+  });
+}));
+
+app.use((error, _req, res, _next) => {
+  console.error(error);
+  return res.status(500).json({
+    success: false,
+    warnings: [
+      {
+        code: "server_error",
+        message: "The server hit an unexpected error while handling this request.",
+        severity: "high",
+      },
+    ],
+    error: process.env.NODE_ENV === "production" ? undefined : error.message,
   });
 });
 

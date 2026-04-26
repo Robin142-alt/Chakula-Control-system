@@ -25,6 +25,9 @@ That makes Railway the fastest production path for this repo.
    - `npm run db:seed`
 6. Run the production smoke test locally before promoting the service:
    - `npm run smoke:prod`
+7. After the app boots on Railway, verify readiness manually:
+   - `/api/health` for liveness
+   - `/api/readiness` for database-backed readiness
 
 ## Railway config in this repo
 
@@ -91,7 +94,9 @@ That aligns with the current Vercel deployment guidance for prebuilt CI pipeline
 - Seed only if you want demo data: `npm run db:seed`
 - Run `npm test`
 - Run `npm run smoke:prod`
+- Run `npm run runtime:check -- https://<your-domain>`
 - Verify `/api/health`
+- Verify `/api/readiness`
 - Verify offline install on one low-end Android device
 - Verify service worker caches the app shell after first load
 

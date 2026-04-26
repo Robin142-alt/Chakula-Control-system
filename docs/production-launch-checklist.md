@@ -14,6 +14,8 @@
 - Run `npm run db:migrate`
 - Run `npm run db:seed` only if you want demo data in the live database
 - Verify `/api/health`
+- Verify `/api/readiness`
+- Run `npm run runtime:check -- https://<your-domain>` after first deploy
 
 ## Hosting
 
@@ -24,6 +26,7 @@
   - app mode
   - port binding
   - Neon connection failures
+  - readiness failures due to missing `DATABASE_URL`
 
 ## Manual acceptance checks
 
@@ -43,4 +46,3 @@
 - Check for repeated `conflict_flag` records
 - Monitor stock mismatch frequency
 - Review missing-leftover alerts after first week
-

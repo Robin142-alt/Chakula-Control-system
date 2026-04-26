@@ -36,6 +36,17 @@ test("health endpoint returns demo mode status", async () => {
   assert.equal(body.success, true);
   assert.equal(body.data_mode, "demo");
   assert.equal(body.demo_inventory_count, 4);
+  assert.equal(body.runtime.ready, true);
+});
+
+test("readiness endpoint returns ready in demo mode", async () => {
+  const response = await fetch(`${baseUrl}/api/readiness`);
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  assert.equal(body.runtime.ready, true);
+  assert.equal(body.runtime.data_mode, "demo");
 });
 
 test("principal dashboard returns only essential metrics and max three alerts", async () => {
@@ -69,4 +80,3 @@ test("reports endpoint returns the full seven-day simulation", async () => {
   assert.equal(body.reports.daily_summaries.length, 7);
   assert.ok(body.reports.generated_insights.length >= 3);
 });
-

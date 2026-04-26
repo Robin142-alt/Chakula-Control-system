@@ -45,20 +45,23 @@ const child = spawn(process.execPath, ["server/index.js"], {
 try {
   await waitForServer(`${baseUrl}/api/health`);
 
-  const [rootResponse, healthResponse, dashboardResponse] = await Promise.all([
+  const [rootResponse, healthResponse, readinessResponse, dashboardResponse] = await Promise.all([
     fetch(baseUrl),
     fetch(`${baseUrl}/api/health`),
+    fetch(`${baseUrl}/api/readiness`),
     fetch(`${baseUrl}/api/dashboard-summary?role=PRINCIPAL&date=2026-04-26`),
   ]);
 
   const rootHtml = await rootResponse.text();
   const health = await healthResponse.json();
+  const readiness = await readinessResponse.json();
   const dashboard = await dashboardResponse.json();
 
   assert(rootResponse.ok, "Root HTML did not load.");
   assert(rootHtml.includes("Chakula Control"), "Root HTML missing app title.");
   assert(health.success === true, "Health endpoint did not return success.");
   assert(health.data_mode === "demo", "Health endpoint did not report demo mode.");
+  assert(readiness.success === true, "Readiness endpoint did not return success.");
   assert(dashboard.success === true, "Dashboard endpoint did not return success.");
   assert(dashboard.dashboard?.todays_cost_kes === 11447.53, "Dashboard total cost drifted from expected demo output.");
   assert(dashboard.dashboard?.alerts?.length === 3, "Principal dashboard should show exactly three high alerts.");

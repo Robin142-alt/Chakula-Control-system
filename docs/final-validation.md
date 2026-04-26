@@ -9,11 +9,13 @@ Executed successfully:
 - `npm test`
 - `npm run build`
 - `npm run smoke:prod`
+- `node scripts/runtime-check.js http://127.0.0.1:3001`
 - `npm run demo:screenshots`
 
 Checked API responses successfully:
 
 - `GET /api/health`
+- `GET /api/readiness`
 - `GET /api/dashboard-summary?role=PRINCIPAL&date=2026-04-26`
 - `GET /api/alerts?role=PRINCIPAL`
 - `GET /api/reports?startDate=2026-04-20&endDate=2026-04-26`
@@ -39,6 +41,12 @@ Container verification note:
 
 - `Dockerfile` and `.dockerignore` were added for production portability.
 - Docker itself was not installed in this environment, so image build verification could not be run here.
+
+Runtime diagnostics note:
+
+- Added liveness at `/api/health`
+- Added readiness at `/api/readiness`
+- Verified readiness against the live Neon-backed local environment
 
 ## Requirement checklist
 
