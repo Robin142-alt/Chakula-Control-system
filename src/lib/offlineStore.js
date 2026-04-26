@@ -441,6 +441,7 @@ export async function loadAppSnapshot() {
     principal_snapshot: buildPrincipalSnapshot(latestSummary, uniqueAlerts),
     report_insights: buildReportInsights(summaries, uniqueAlerts),
     activity_feed: activityFeed,
+    sync_queue: [...sync_queue].sort((left, right) => String(left.created_at).localeCompare(String(right.created_at))),
     settings: {
       ...DEFAULT_APP_SETTINGS,
       ...(settingsRow?.value || {}),

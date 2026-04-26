@@ -74,6 +74,9 @@ export default function DashboardPage({
               <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("backfill-import")}>
                 Backfill CSV
               </button>
+              <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("sync-center")}>
+                Sync center
+              </button>
             </>
           )}
           {activeUser.role === "COOK" && (
@@ -84,6 +87,9 @@ export default function DashboardPage({
               <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("backfill-import")}>
                 Backfill CSV
               </button>
+              <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("sync-center")}>
+                Sync center
+              </button>
             </>
           )}
           {activeUser.role === "ADMIN" && (
@@ -93,6 +99,9 @@ export default function DashboardPage({
               </button>
               <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("settings")}>
                 Device settings
+              </button>
+              <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("sync-center")}>
+                Sync center
               </button>
             </>
           )}

@@ -34,6 +34,15 @@ async function launchBrowser() {
   }
 }
 
+async function hideBottomNavForScreenshots(page) {
+  await page.addStyleTag({
+    content: `
+      .bottom-nav { display: none !important; }
+      .app-shell { padding-bottom: 1rem !important; }
+    `,
+  });
+}
+
 async function loginAs(page, userId, pin) {
   await page.getByLabel("Account").selectOption(String(userId));
   await page.getByLabel("PIN").fill(pin);
@@ -44,6 +53,61 @@ async function loginAs(page, userId, pin) {
 async function signOut(page) {
   await page.getByRole("button", { name: /sign out/i }).click();
   await page.getByRole("button", { name: /^sign in$/i }).waitFor({ timeout: 15000 });
+}
+
+async function seedPendingSyncRecord(page) {
+  await page.evaluate(async () => {
+    const request = window.indexedDB.open("chakula-control-local");
+
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+
+    await new Promise((resolve, reject) => {
+      const transaction = db.transaction(["issue_logs", "sync_queue"], "readwrite");
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+
+      transaction.objectStore("issue_logs").put({
+        id: "local-screenshot-sync",
+        item_id: 102,
+        quantity: 18,
+        meal_type: "LUNCH",
+        date_time: "2026-04-26T10:58:00.000Z",
+        raw_input_text: "2 debes beans captured while the network was down",
+        notes: "Screenshot seed",
+        created_by: 1,
+        entered_late: true,
+        conflict_flag: true,
+        sync_status: "pending",
+      });
+
+      transaction.objectStore("sync_queue").put({
+        id: "queue-local-screenshot-sync",
+        created_at: "2026-04-26T11:02:00.000Z",
+        endpoint: "/issue-stock",
+        store_name: "issue_logs",
+        payload: {
+          id: "local-screenshot-sync",
+          item_id: 102,
+          quantity: 18,
+          meal_type: "LUNCH",
+          date_time: "2026-04-26T10:58:00.000Z",
+          raw_input_text: "2 debes beans captured while the network was down",
+          notes: "Screenshot seed",
+          created_by: 1,
+          entered_late: true,
+          conflict_flag: true,
+        },
+        conflict_flag: true,
+        attempts: 2,
+        last_error: "Network was unavailable during the last sync attempt.",
+      });
+    });
+
+    db.close();
+  });
 }
 
 await mkdir(screenshotsDir, { recursive: true });
@@ -72,12 +136,7 @@ try {
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   await loginAs(page, 1, "2048");
-  await page.addStyleTag({
-    content: `
-      .bottom-nav { display: none !important; }
-      .app-shell { padding-bottom: 1rem !important; }
-    `,
-  });
+  await hideBottomNavForScreenshots(page);
   await page.screenshot({ path: resolve(screenshotsDir, "01-storekeeper-dashboard.png"), fullPage: true });
 
   await page.getByRole("button", { name: "Issue stock", exact: true }).click();
@@ -124,6 +183,15 @@ try {
   await page.getByRole("button", { name: /view reports/i }).first().click();
   await page.waitForLoadState("networkidle");
   await page.screenshot({ path: resolve(screenshotsDir, "09-reports-modules.png"), fullPage: true });
+
+  await signOut(page);
+  await loginAs(page, 1, "2048");
+  await seedPendingSyncRecord(page);
+  await page.reload({ waitUntil: "networkidle" });
+  await hideBottomNavForScreenshots(page);
+  await page.getByRole("button", { name: /sync center/i }).first().click();
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: resolve(screenshotsDir, "10-sync-center.png"), fullPage: true });
 
   await browser.close();
   console.log(`Saved demo screenshots to ${screenshotsDir}`);

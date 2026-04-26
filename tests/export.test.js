@@ -7,7 +7,9 @@ import {
   buildAlertExportRows,
   buildCsv,
   buildDailySummaryExportRows,
+  buildLocalBackupDocument,
   buildPrincipalBriefHtml,
+  buildSyncQueueSummary,
 } from "../src/lib/export.js";
 
 function buildDemoSummaryState() {
@@ -81,4 +83,57 @@ test("principal brief html stays school-friendly and limited to top alerts", () 
   assert.ok(html.includes("Main Kitchen daily principal brief"));
   assert.ok(html.includes("Top alerts"));
   assert.ok(listItems.length <= 3);
+});
+
+test("sync queue summary counts pending, retries, and conflicts", () => {
+  const summary = buildSyncQueueSummary([
+    {
+      id: "queue-1",
+      store_name: "issue_logs",
+      created_at: "2026-04-26T08:00:00.000Z",
+      attempts: 0,
+      conflict_flag: false,
+    },
+    {
+      id: "queue-2",
+      store_name: "stock_counts",
+      created_at: "2026-04-25T08:00:00.000Z",
+      attempts: 2,
+      conflict_flag: true,
+      last_error: "offline",
+    },
+  ]);
+
+  assert.equal(summary.pending_count, 2);
+  assert.equal(summary.retry_count, 1);
+  assert.equal(summary.conflict_count, 1);
+  assert.equal(summary.oldest_pending_at, "2026-04-25T08:00:00.000Z");
+  assert.equal(summary.type_counts.issue_logs, 1);
+  assert.equal(summary.type_counts.stock_counts, 1);
+});
+
+test("local backup document includes queue summary and settings", () => {
+  const backup = JSON.parse(buildLocalBackupDocument({
+    settings: {
+      school_name: "Demo Boarding School",
+    },
+    queueItems: [
+      {
+        id: "queue-1",
+        store_name: "issue_logs",
+        created_at: "2026-04-26T08:00:00.000Z",
+      },
+    ],
+    issueLogs: [{ id: 1 }],
+    leftoverLogs: [],
+    stockCounts: [],
+    studentCounts: [],
+    alerts: [],
+    summaries: [],
+  }));
+
+  assert.equal(backup.app_name, "Chakula Control");
+  assert.equal(backup.settings.school_name, "Demo Boarding School");
+  assert.equal(backup.sync_queue_summary.pending_count, 1);
+  assert.equal(backup.local_records.issue_logs.length, 1);
 });

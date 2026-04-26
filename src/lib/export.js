@@ -57,6 +57,56 @@ export function buildAlertExportRows(alerts = []) {
   }));
 }
 
+export function buildSyncQueueSummary(queueItems = []) {
+  const typeCounts = queueItems.reduce((counts, queueItem) => {
+    const key = String(queueItem.store_name || "unknown");
+    return {
+      ...counts,
+      [key]: (counts[key] || 0) + 1,
+    };
+  }, {});
+
+  return {
+    pending_count: queueItems.length,
+    conflict_count: queueItems.filter((queueItem) => queueItem.conflict_flag).length,
+    retry_count: queueItems.filter((queueItem) => Number(queueItem.attempts || 0) > 0 || queueItem.last_error).length,
+    oldest_pending_at: queueItems
+      .map((queueItem) => queueItem.created_at)
+      .filter(Boolean)
+      .sort()[0] || null,
+    type_counts: typeCounts,
+  };
+}
+
+export function buildLocalBackupDocument({
+  settings,
+  queueItems = [],
+  issueLogs = [],
+  leftoverLogs = [],
+  stockCounts = [],
+  studentCounts = [],
+  alerts = [],
+  summaries = [],
+}) {
+  const summary = buildSyncQueueSummary(queueItems);
+  return JSON.stringify({
+    exported_at: new Date().toISOString(),
+    app_name: "Chakula Control",
+    schema_version: 1,
+    settings,
+    sync_queue_summary: summary,
+    sync_queue: queueItems,
+    local_records: {
+      issue_logs: issueLogs,
+      leftover_logs: leftoverLogs,
+      stock_counts: stockCounts,
+      student_counts: studentCounts,
+    },
+    alerts,
+    summaries,
+  }, null, 2);
+}
+
 export function downloadTextFile(filename, text, mimeType = "text/plain;charset=utf-8") {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return false;

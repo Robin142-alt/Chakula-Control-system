@@ -32,6 +32,7 @@ Show that the system works in messy school reality:
 11. Open `Device settings` and show how one shared phone can still feel local to the school.
 12. End on Reports and explain the seven-day anomaly story through budget, expected usage, and actual consumption.
 13. Use the report actions to export a CSV or print a principal brief for offline handoff.
+14. Open `Sync center` and show one waiting record, retry attempts, conflict flag, and backup download.
 
 ## Suggested talking points
 
@@ -46,6 +47,7 @@ Show that the system works in messy school reality:
 - "Each alert is translated into likely waste, recording error, or possible theft with a next check to do."
 - "Reports are not just raw exports. They show budget tracking, expected usage, consumption, and anomaly decisions in plain language."
 - "When the principal or accountant still wants paper, one tap prints a short brief or downloads the CSV."
+- "If the network is bad for hours, staff can still see exactly what is waiting and carry a JSON backup off the phone."
 
 ## Screenshot set
 
@@ -58,6 +60,7 @@ Show that the system works in messy school reality:
 - Admin audit trail: [07-admin-audit.png](screenshots/07-admin-audit.png)
 - Admin device settings: [08-admin-settings.png](screenshots/08-admin-settings.png)
 - Reports modules: [09-reports-modules.png](screenshots/09-reports-modules.png)
+- Sync center: [10-sync-center.png](screenshots/10-sync-center.png)
 
 ## Demo commands
 

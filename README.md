@@ -15,6 +15,7 @@ Offline-first Smart Kitchen Accountability System built for low-resource boardin
 - Admin shared-device settings for school name, kitchen name, default headcount, and alert contact
 - CSV backfill import for paper records and late entry cleanup
 - Downloadable backfill CSV template and sample reset for faster paper cleanup
+- Sync center for pending queue visibility, conflict review, retry awareness, and local backup download
 - Alerts translated into likely `WASTE`, `ERROR`, or `POSSIBLE_THEFT`
 - Reports that make `Consumption`, `Expected Usage`, `Budget Tracking`, and `Anomalies` explicit instead of hiding them in raw tables
 - Offline-friendly exports for daily summaries, alert review, and a printable principal brief
@@ -140,6 +141,7 @@ In `APP_DATA_MODE=demo`, authenticated writes are preserved in the local queue a
 - Local-first storage and sync: [src/lib/offlineStore.js](src/lib/offlineStore.js)
 - Frontend app shell: [src/App.jsx](src/App.jsx)
 - Admin settings screen: [src/pages/SettingsPage.jsx](src/pages/SettingsPage.jsx)
+- Sync center screen: [src/pages/SyncCenterPage.jsx](src/pages/SyncCenterPage.jsx)
 - Export and print helpers: [src/lib/export.js](src/lib/export.js)
 - Simulated output: [docs/simulated-dashboard-output.json](docs/simulated-dashboard-output.json)
 - Deployment notes: [docs/deployment.md](docs/deployment.md)

@@ -33,6 +33,7 @@ Checked frontend shell successfully:
 - Student count screen bundled successfully
 - Admin audit trail screen bundled successfully
 - Admin settings screen bundled successfully
+- Sync center screen bundled successfully
 - CSV backfill page bundled successfully
 - Reports page bundled with explicit budget, expected usage, consumption, and anomaly sections
 - Export actions bundled for daily CSV, alerts CSV, and printable principal brief
@@ -48,6 +49,7 @@ Generated demo screenshots successfully:
 - `docs/screenshots/07-admin-audit.png`
 - `docs/screenshots/08-admin-settings.png`
 - `docs/screenshots/09-reports-modules.png`
+- `docs/screenshots/10-sync-center.png`
 
 Browser automation fallback note:
 
@@ -78,6 +80,7 @@ Runtime diagnostics note:
   - Service worker caches the app shell.
   - Background sync queue retries later.
   - Offline PIN sign-in works after one trusted online login on that device.
+  - Sync center exposes pending records, retry notes, and local backup download without needing the server.
 
 - Fast actions:
   - Form saves happen locally first.
@@ -120,6 +123,7 @@ Runtime diagnostics note:
 - Conflicts handled:
   - Duplicate local fingerprints mark `conflict_flag`
   - Stock counts use last-write-wins for current stock position
+  - Sync center makes conflict-flagged pending items visible before they reach the server
 
 - Audit trail exists:
   - `activity_logs` table

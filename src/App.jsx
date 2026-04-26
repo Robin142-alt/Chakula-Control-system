@@ -10,6 +10,7 @@ import BackfillImportPage from "./pages/BackfillImportPage.jsx";
 import StudentCountPage from "./pages/StudentCountPage.jsx";
 import AuditLogPage from "./pages/AuditLogPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
+import SyncCenterPage from "./pages/SyncCenterPage.jsx";
 import { ROLE_ACCESS, USERS } from "../data/demoData.js";
 import { formatAuthMode } from "./lib/authClient.js";
 import {
@@ -59,6 +60,7 @@ export default function App() {
     principal_snapshot: { todays_cost_kes: 0, cost_per_student_kes: 0, alerts: [] },
     report_insights: null,
     activity_feed: [],
+    sync_queue: [],
     settings: DEFAULT_APP_SETTINGS,
     queue_count: 0,
     last_sync_at: null,
@@ -201,6 +203,15 @@ export default function App() {
     await refreshAppState({ syncRemoteUsers: false });
   };
 
+  const handleSyncNow = async () => {
+    if (!navigator.onLine) {
+      setFeedback("Still offline. Records remain safe on this device until the connection returns.");
+      return;
+    }
+
+    await runSync();
+  };
+
   if (!activeUser) {
     return (
       <LoginPage
@@ -323,6 +334,24 @@ export default function App() {
             activeUser={activeUser}
             settings={snapshot.settings}
             onSaveSettings={handleSaveSettings}
+            feedback={feedback}
+          />
+        )}
+        {activePage === "sync-center" && (
+          <SyncCenterPage
+            activeUser={activeUser}
+            inventoryItems={snapshot.inventory_items}
+            queueItems={snapshot.sync_queue}
+            issueLogs={snapshot.issue_logs || []}
+            leftoverLogs={snapshot.leftover_logs || []}
+            stockCounts={snapshot.stock_counts || []}
+            studentCounts={snapshot.student_counts || []}
+            alerts={snapshot.alerts}
+            summaries={snapshot.summaries}
+            settings={snapshot.settings}
+            isOnline={isOnline}
+            syncing={syncing}
+            onSyncNow={handleSyncNow}
             feedback={feedback}
           />
         )}

@@ -1,11 +1,11 @@
 export const MEAL_ORDER = ["BREAKFAST", "LUNCH", "DINNER"];
 
 export const ROLE_ACCESS = {
-  STOREKEEPER: ["dashboard", "issue-stock", "student-count", "inventory", "stock-count", "backfill-import", "reports"],
-  COOK: ["dashboard", "log-leftovers", "inventory", "backfill-import", "reports"],
+  STOREKEEPER: ["dashboard", "issue-stock", "student-count", "inventory", "stock-count", "backfill-import", "sync-center", "reports"],
+  COOK: ["dashboard", "log-leftovers", "inventory", "backfill-import", "sync-center", "reports"],
   ACCOUNTANT: ["dashboard", "inventory", "reports"],
   PRINCIPAL: ["dashboard"],
-  ADMIN: ["dashboard", "inventory", "reports", "audit-log", "settings"],
+  ADMIN: ["dashboard", "inventory", "reports", "audit-log", "sync-center", "settings"],
 };
 
 export const USERS = [
