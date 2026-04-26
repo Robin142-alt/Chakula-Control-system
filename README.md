@@ -16,6 +16,7 @@ Offline-first Smart Kitchen Accountability System built for low-resource boardin
 - CSV backfill import for paper records and late entry cleanup
 - Downloadable backfill CSV template and sample reset for faster paper cleanup
 - Sync center for pending queue visibility, conflict review, retry awareness, and local backup download
+- Backup restore flow that re-adds pending records to a replacement phone without wiping current local data
 - Alerts translated into likely `WASTE`, `ERROR`, or `POSSIBLE_THEFT`
 - Reports that make `Consumption`, `Expected Usage`, `Budget Tracking`, and `Anomalies` explicit instead of hiding them in raw tables
 - Offline-friendly exports for daily summaries, alert review, and a printable principal brief

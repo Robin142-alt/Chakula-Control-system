@@ -10,6 +10,7 @@ import {
   buildLocalBackupDocument,
   buildPrincipalBriefHtml,
   buildSyncQueueSummary,
+  parseLocalBackupText,
 } from "../src/lib/export.js";
 
 function buildDemoSummaryState() {
@@ -136,4 +137,31 @@ test("local backup document includes queue summary and settings", () => {
   assert.equal(backup.settings.school_name, "Demo Boarding School");
   assert.equal(backup.sync_queue_summary.pending_count, 1);
   assert.equal(backup.local_records.issue_logs.length, 1);
+});
+
+test("backup parser rejects invalid json and warns on empty files", () => {
+  const invalid = parseLocalBackupText("{not json}");
+  const empty = parseLocalBackupText("");
+
+  assert.equal(invalid.success, false);
+  assert.ok(invalid.warnings[0].includes("valid JSON"));
+  assert.equal(empty.success, false);
+  assert.ok(empty.warnings[0].includes("Choose a backup JSON file"));
+});
+
+test("backup parser normalizes queue-only restore data", () => {
+  const parsed = parseLocalBackupText(JSON.stringify({
+    app_name: "Chakula Control",
+    schema_version: 1,
+    sync_queue: [
+      {
+        id: "queue-1",
+        store_name: "issue_logs",
+      },
+    ],
+  }));
+
+  assert.equal(parsed.success, true);
+  assert.equal(parsed.backup.sync_queue.length, 1);
+  assert.equal(parsed.warnings.length, 0);
 });

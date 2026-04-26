@@ -107,6 +107,49 @@ export function buildLocalBackupDocument({
   }, null, 2);
 }
 
+export function parseLocalBackupText(text) {
+  const trimmed = String(text || "").trim();
+  if (!trimmed) {
+    return {
+      success: false,
+      backup: null,
+      warnings: ["Choose a backup JSON file first."],
+    };
+  }
+
+  try {
+    const backup = JSON.parse(trimmed);
+    const warnings = [];
+
+    if (backup?.app_name !== "Chakula Control") {
+      warnings.push("This file does not declare Chakula Control, but queue-only restore can still be attempted.");
+    }
+
+    if (backup?.schema_version !== 1) {
+      warnings.push("Backup schema version is different, so only safe queue import will be attempted.");
+    }
+
+    if (!Array.isArray(backup?.sync_queue) || !backup.sync_queue.length) {
+      warnings.push("No pending sync records were found in this backup.");
+    }
+
+    return {
+      success: true,
+      backup: {
+        ...backup,
+        sync_queue: Array.isArray(backup?.sync_queue) ? backup.sync_queue : [],
+      },
+      warnings,
+    };
+  } catch {
+    return {
+      success: false,
+      backup: null,
+      warnings: ["That file was not valid JSON."],
+    };
+  }
+}
+
 export function downloadTextFile(filename, text, mimeType = "text/plain;charset=utf-8") {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return false;

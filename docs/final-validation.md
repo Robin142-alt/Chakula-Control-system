@@ -11,6 +11,7 @@ Executed successfully:
 - `npm run smoke:prod`
 - `node scripts/runtime-check.js http://127.0.0.1:3001`
 - `npm run demo:screenshots`
+- browser-level backup restore check against the live app in demo mode
 
 Checked API responses successfully:
 
@@ -81,6 +82,7 @@ Runtime diagnostics note:
   - Background sync queue retries later.
   - Offline PIN sign-in works after one trusted online login on that device.
   - Sync center exposes pending records, retry notes, and local backup download without needing the server.
+  - Backup restore re-adds pending queue records without wiping current local device data.
 
 - Fast actions:
   - Form saves happen locally first.

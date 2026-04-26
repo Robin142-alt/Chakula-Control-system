@@ -20,6 +20,7 @@ import {
   getStoredUsers,
   loadAppSnapshot,
   loginWithPin,
+  importLocalBackupDocument,
   requestBackgroundSync,
   saveAppSettings,
   saveEntriesLocally,
@@ -212,6 +213,27 @@ export default function App() {
     await runSync();
   };
 
+  const handleImportBackup = async (backup) => {
+    const result = await importLocalBackupDocument(backup);
+    const notes = [];
+    if (result.imported_count) {
+      notes.push(`Restored ${result.imported_count} pending record${result.imported_count === 1 ? "" : "s"} to this phone.`);
+    }
+    if (result.skipped_duplicates) {
+      notes.push(`Skipped ${result.skipped_duplicates} record${result.skipped_duplicates === 1 ? "" : "s"} already present here.`);
+    }
+    if (result.applied_settings) {
+      notes.push("Backup settings were applied because this phone was still on defaults.");
+    }
+    if (result.warnings.length) {
+      notes.push(result.warnings.join(" "));
+    }
+
+    setFeedback(notes.join(" ") || "Backup restore finished.");
+    await refreshAppState({ syncRemoteUsers: false });
+    return result;
+  };
+
   if (!activeUser) {
     return (
       <LoginPage
@@ -352,6 +374,7 @@ export default function App() {
             isOnline={isOnline}
             syncing={syncing}
             onSyncNow={handleSyncNow}
+            onImportBackup={handleImportBackup}
             feedback={feedback}
           />
         )}

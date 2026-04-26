@@ -27,6 +27,13 @@ const STORE_NAMES = [
   "alerts",
   "sync_queue",
 ];
+const STORE_ENDPOINTS = {
+  issue_logs: "/issue-stock",
+  leftover_logs: "/log-leftover",
+  stock_counts: "/stock-count",
+  student_counts: "/student-count",
+};
+const RESTORABLE_STORE_NAMES = Object.keys(STORE_ENDPOINTS);
 
 function getApiBaseUrl() {
   const configuredBaseUrl = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "");
@@ -501,20 +508,113 @@ async function savePreparedEntryLocally(db, { storeName, endpoint, payload, auth
 
   await store.objectStore(storeName).put(record);
   await store.objectStore("sync_queue").put({
-    id: `queue-${record.id}`,
-    created_at: now,
+    id: authContext?.queue_id || `queue-${record.id}`,
+    created_at: authContext?.created_at || now,
     endpoint,
     store_name: storeName,
     payload: record,
-    auth_context: authContext,
-    conflict_flag: record.conflict_flag,
-    attempts: 0,
+    auth_context: authContext?.context || authContext || null,
+    conflict_flag: record.conflict_flag || Boolean(authContext?.conflict_flag),
+    attempts: safeNumber(authContext?.attempts),
+    last_error: authContext?.last_error || null,
   });
   await store.done;
 
   return {
     warnings: createLocalWarnings(record, storeName),
     record,
+  };
+}
+
+function settingsUseDefaults(settings = {}) {
+  return Object.entries(DEFAULT_APP_SETTINGS).every(([key, defaultValue]) => {
+    const currentValue = settings?.[key];
+    return currentValue === undefined || currentValue === null || currentValue === "" || currentValue === defaultValue;
+  });
+}
+
+export async function importLocalBackupDocument(backup) {
+  await seedKitchenDb();
+  const db = await openKitchenDb();
+  const warnings = [];
+  let importedCount = 0;
+  let skippedDuplicates = 0;
+  let appliedSettings = false;
+
+  if (!backup || typeof backup !== "object") {
+    return {
+      imported_count: 0,
+      skipped_duplicates: 0,
+      applied_settings: false,
+      warnings: ["Backup document was missing or unreadable."],
+    };
+  }
+
+  const settingsRow = await db.get("meta", "app_settings");
+  const currentSettings = {
+    ...DEFAULT_APP_SETTINGS,
+    ...(settingsRow?.value || {}),
+  };
+  const importedSettings = backup.settings && typeof backup.settings === "object"
+    ? {
+        ...DEFAULT_APP_SETTINGS,
+        ...backup.settings,
+      }
+    : null;
+
+  if (importedSettings) {
+    if (settingsUseDefaults(currentSettings)) {
+      await db.put("meta", { id: "app_settings", value: importedSettings });
+      appliedSettings = true;
+    } else if (JSON.stringify(currentSettings) !== JSON.stringify(importedSettings)) {
+      warnings.push("Backup included device settings, but this phone kept its current local settings.");
+    }
+  }
+
+  for (const queueItem of backup.sync_queue || []) {
+    const storeName = String(queueItem?.store_name || "");
+    if (!RESTORABLE_STORE_NAMES.includes(storeName)) {
+      warnings.push(`Skipped unsupported backup record type "${storeName || "unknown"}".`);
+      continue;
+    }
+
+    const endpoint = queueItem.endpoint || STORE_ENDPOINTS[storeName];
+    const payload = queueItem.payload || {};
+    const queueId = queueItem.id || `queue-${payload.id || createLocalId()}`;
+    const existingQueue = await db.get("sync_queue", queueId);
+    const existingRecord = payload.id ? await db.get(storeName, payload.id) : null;
+
+    if (existingQueue || existingRecord) {
+      skippedDuplicates += 1;
+      continue;
+    }
+
+    const result = await savePreparedEntryLocally(db, {
+      storeName,
+      endpoint,
+      payload: {
+        ...payload,
+        id: payload.id || createLocalId(),
+      },
+      authContext: {
+        queue_id: queueId,
+        created_at: queueItem.created_at,
+        attempts: queueItem.attempts,
+        last_error: queueItem.last_error,
+        conflict_flag: queueItem.conflict_flag,
+        context: queueItem.auth_context || null,
+      },
+    });
+
+    importedCount += 1;
+    warnings.push(...result.warnings.map((warning) => `Imported record note: ${warning}`));
+  }
+
+  return {
+    imported_count: importedCount,
+    skipped_duplicates: skippedDuplicates,
+    applied_settings: appliedSettings,
+    warnings,
   };
 }
 

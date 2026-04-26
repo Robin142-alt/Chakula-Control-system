@@ -4,6 +4,7 @@ import {
   buildLocalBackupDocument,
   buildSyncQueueSummary,
   downloadTextFile,
+  parseLocalBackupText,
 } from "../lib/export.js";
 import { formatMealLabel } from "../lib/format.js";
 
@@ -37,9 +38,12 @@ export default function SyncCenterPage({
   isOnline,
   syncing,
   onSyncNow,
+  onImportBackup,
   feedback,
 }) {
   const [localMessage, setLocalMessage] = useState("");
+  const [backupText, setBackupText] = useState("");
+  const [backupFileName, setBackupFileName] = useState("");
   const itemMap = useMemo(
     () => new Map((inventoryItems || []).map((item) => [Number(item.id), item])),
     [inventoryItems],
@@ -67,6 +71,42 @@ export default function SyncCenterPage({
       "application/json;charset=utf-8",
     );
     setLocalMessage("Local backup downloaded. This can be carried on flash disk or shared later.");
+  };
+
+  const handleBackupFileChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const text = await file.text();
+    setBackupText(text);
+    setBackupFileName(file.name);
+    setLocalMessage(`Loaded ${file.name}. Ready to restore pending records to this phone.`);
+  };
+
+  const handleBackupImport = async () => {
+    const parsed = parseLocalBackupText(backupText);
+    if (!parsed.success) {
+      setLocalMessage(parsed.warnings.join(" "));
+      return;
+    }
+
+    const result = await onImportBackup(parsed.backup);
+    const notes = [...parsed.warnings];
+    if (result.imported_count) {
+      notes.push(`Imported ${result.imported_count} waiting record${result.imported_count === 1 ? "" : "s"}.`);
+    }
+    if (result.skipped_duplicates) {
+      notes.push(`Skipped ${result.skipped_duplicates} duplicate record${result.skipped_duplicates === 1 ? "" : "s"}.`);
+    }
+    if (result.applied_settings) {
+      notes.push("Applied backup school settings because this phone was still using defaults.");
+    }
+    if (!notes.length) {
+      notes.push("Backup restore finished.");
+    }
+    setLocalMessage(notes.join(" "));
   };
 
   const typeEntries = Object.entries(summary.type_counts || {});
@@ -104,6 +144,27 @@ export default function SyncCenterPage({
           </button>
         </div>
         {(localMessage || feedback) && <p className="feedback-line">{localMessage || feedback}</p>}
+      </section>
+
+      <section className="panel">
+        <div className="panel__header">
+          <h3>Restore backup</h3>
+          <span>Additive only</span>
+        </div>
+        <label className="field">
+          <span>Backup JSON file</span>
+          <input type="file" accept=".json,application/json" onChange={handleBackupFileChange} />
+        </label>
+        <div className="count-hint">
+          <span>{backupFileName || "No backup file loaded yet"}</span>
+          <span>Current device data stays in place</span>
+        </div>
+        <button className="secondary-button" type="button" onClick={handleBackupImport} disabled={!backupText}>
+          Restore pending records to this phone
+        </button>
+        <p className="empty-state">
+          Imported backups never wipe this device. Existing records stay, duplicates are skipped, and queue conflicts remain visible.
+        </p>
       </section>
 
       <section className="panel">
