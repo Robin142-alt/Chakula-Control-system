@@ -113,6 +113,18 @@ try {
   await page.waitForLoadState("networkidle");
   await page.screenshot({ path: resolve(screenshotsDir, "07-admin-audit.png"), fullPage: true });
 
+  await signOut(page);
+  await loginAs(page, 5, "7788");
+  await page.getByRole("button", { name: /device settings/i }).first().click();
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: resolve(screenshotsDir, "08-admin-settings.png"), fullPage: true });
+
+  await signOut(page);
+  await loginAs(page, 1, "2048");
+  await page.getByRole("button", { name: /view reports/i }).first().click();
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: resolve(screenshotsDir, "09-reports-modules.png"), fullPage: true });
+
   await browser.close();
   console.log(`Saved demo screenshots to ${screenshotsDir}`);
 } finally {

@@ -29,7 +29,8 @@ Show that the system works in messy school reality:
    - cost per student
    - top 3 high alerts only
 10. Switch to the Admin role and open `Audit trail`.
-11. End on Reports and explain the seven-day anomaly story.
+11. Open `Device settings` and show how one shared phone can still feel local to the school.
+12. End on Reports and explain the seven-day anomaly story through budget, expected usage, and actual consumption.
 
 ## Suggested talking points
 
@@ -39,8 +40,10 @@ Show that the system works in messy school reality:
 - "Student count is captured separately so cost per student remains meaningful even on messy days."
 - "The Principal sees only the essentials, not a complicated stock screen."
 - "Admin can still trace late entries, conflicts, and alerts without touching the kitchen workflow."
+- "Admin can rename the school, kitchen, and default student count on the device without needing a developer."
 - "The system helps separate normal variance from duplicate issues, missing leftovers, and stock mismatches."
 - "Each alert is translated into likely waste, recording error, or possible theft with a next check to do."
+- "Reports are not just raw exports. They show budget tracking, expected usage, consumption, and anomaly decisions in plain language."
 
 ## Screenshot set
 
@@ -51,6 +54,8 @@ Show that the system works in messy school reality:
 - Principal summary: [05-principal-view.png](screenshots/05-principal-view.png)
 - Student count capture: [06-student-count.png](screenshots/06-student-count.png)
 - Admin audit trail: [07-admin-audit.png](screenshots/07-admin-audit.png)
+- Admin device settings: [08-admin-settings.png](screenshots/08-admin-settings.png)
+- Reports modules: [09-reports-modules.png](screenshots/09-reports-modules.png)
 
 ## Demo commands
 

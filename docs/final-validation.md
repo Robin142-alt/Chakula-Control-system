@@ -32,7 +32,9 @@ Checked frontend shell successfully:
 - Shared-device login screen rendered
 - Student count screen bundled successfully
 - Admin audit trail screen bundled successfully
+- Admin settings screen bundled successfully
 - CSV backfill page bundled successfully
+- Reports page bundled with explicit budget, expected usage, consumption, and anomaly sections
 
 Generated demo screenshots successfully:
 
@@ -43,6 +45,8 @@ Generated demo screenshots successfully:
 - `docs/screenshots/05-principal-view.png`
 - `docs/screenshots/06-student-count.png`
 - `docs/screenshots/07-admin-audit.png`
+- `docs/screenshots/08-admin-settings.png`
+- `docs/screenshots/09-reports-modules.png`
 
 Browser automation fallback note:
 
@@ -88,6 +92,9 @@ Runtime diagnostics note:
   - Daily cost
   - Cost per student
   - Waste estimate
+  - Consumption by meal
+  - Expected usage plan by meal
+  - Budget tracking by day
   - Expected vs actual variance
   - Top alerts by severity
   - Weekly meal watchlist
@@ -105,7 +112,7 @@ Runtime diagnostics note:
   - Cook: leftovers, CSV backfill for leftover paper logs
   - Accountant: read-only dashboard, inventory, reports
   - Principal: today's cost, cost per student, max 3 high alerts
-  - Admin: read-only visibility through dashboard/inventory/reports plus audit trail
+  - Admin: read-only visibility through dashboard/inventory/reports plus audit trail and local device settings
 
 - Conflicts handled:
   - Duplicate local fingerprints mark `conflict_flag`

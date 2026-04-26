@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import { appendFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { getDemoDataset } from "../data/derivedData.js";
+import { buildReportInsights, getDemoDataset } from "../data/derivedData.js";
 import { DEMO_DATA, ROLE_ACCESS, USERS } from "../data/demoData.js";
 import {
   buildCostTrackingRows,
@@ -1077,6 +1077,7 @@ app.get("/api/reports", asyncHandler(async (req, res) => {
       daily_summaries: summaries,
       meal_costs: mealCosts,
       alerts,
+      report_insights: buildReportInsights(summaries, alerts),
       generated_insights: [
         `Average daily cost: KES ${roundValue(
           summaries.reduce((total, summary) => total + safeNumber(summary.total_cost_kes), 0) /
@@ -1092,6 +1093,7 @@ app.get("/api/reports", asyncHandler(async (req, res) => {
             )[0]?.waste_estimate_kes || 0,
           )
         }`,
+        `Possible theft flags: ${alerts.filter((alert) => alert.issue_assessment === "POSSIBLE_THEFT").length}`,
       ],
     },
   });

@@ -87,9 +87,14 @@ export default function DashboardPage({
             </>
           )}
           {activeUser.role === "ADMIN" && (
-            <button className="quick-action" type="button" onClick={() => onNavigate("audit-log")}>
-              Audit trail
-            </button>
+            <>
+              <button className="quick-action" type="button" onClick={() => onNavigate("audit-log")}>
+                Audit trail
+              </button>
+              <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("settings")}>
+                Device settings
+              </button>
+            </>
           )}
           <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("reports")}>
             View reports

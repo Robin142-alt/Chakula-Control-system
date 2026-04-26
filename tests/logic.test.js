@@ -108,6 +108,10 @@ test("report insights highlight cost, waste, and missing leftover pressure point
   assert.ok(insights.missingLeftoverCount >= 2);
   assert.ok(insights.issueAssessmentCounts.POSSIBLE_THEFT >= 1);
   assert.ok(insights.issueAssessmentCounts.ERROR >= 1);
+  assert.equal(insights.budgetRows.length, 7);
+  assert.equal(insights.latestPlan.length, 3);
+  assert.equal(insights.consumptionRows.length, 3);
+  assert.ok(insights.anomalyDecisions.length >= 1);
   assert.ok(insights.mealWatchlist.length >= 1);
 });
 

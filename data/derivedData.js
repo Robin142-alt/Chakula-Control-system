@@ -225,6 +225,7 @@ export function buildReportInsights(summaries = [], alerts = []) {
   const highestCostPerStudentDay = [...summaries].sort(
     (left, right) => safeNumber(right.cost_per_student_kes) - safeNumber(left.cost_per_student_kes),
   )[0] || null;
+  const latestSummary = summaries[summaries.length - 1] || null;
 
   const mealWatchlist = summaries
     .flatMap((summary) =>
@@ -250,6 +251,61 @@ export function buildReportInsights(summaries = [], alerts = []) {
         summaries.reduce((total, summary) => total + safeNumber(summary.cost_per_student_kes), 0) / summaries.length,
       )
     : 0;
+  const budgetRows = summaries.map((summary) => {
+    const variance_kes = roundValue(safeNumber(summary.total_cost_kes) - safeNumber(summary.total_expected_cost_kes));
+    return {
+      date: summary.date,
+      actual_kes: summary.total_cost_kes,
+      budget_kes: summary.total_expected_cost_kes,
+      variance_kes,
+      status:
+        variance_kes > 200 ? "Over budget" : variance_kes < -200 ? "Under plan" : "Near plan",
+    };
+  });
+  const latestPlan = latestSummary
+    ? latestSummary.meal_summaries.map((meal) => ({
+        date: latestSummary.date,
+        student_count: latestSummary.student_count,
+        meal_type: meal.meal_type,
+        expected_cost_kes: meal.expected_cost_kes,
+        actual_cost_kes: meal.cost_kes,
+        variance_kes: meal.variance_kes,
+      }))
+    : [];
+  const consumptionRows = latestSummary
+    ? latestSummary.meal_summaries.map((meal) => {
+        const total_issued_quantity = roundValue(
+          meal.items.reduce((total, item) => total + safeNumber(item.issued_quantity), 0),
+        );
+        const total_actual_quantity = roundValue(
+          meal.items.reduce((total, item) => total + safeNumber(item.actual_quantity), 0),
+        );
+        const total_expected_quantity = roundValue(
+          meal.items.reduce((total, item) => total + safeNumber(item.expected_quantity), 0),
+        );
+        const total_leftover_quantity = roundValue(
+          meal.items.reduce((total, item) => total + safeNumber(item.leftover_quantity), 0),
+        );
+        const topItem = [...meal.items].sort(
+          (left, right) => safeNumber(right.actual_quantity) - safeNumber(left.actual_quantity),
+        )[0] || null;
+
+        return {
+          date: latestSummary.date,
+          meal_type: meal.meal_type,
+          total_issued_quantity,
+          total_actual_quantity,
+          total_expected_quantity,
+          total_leftover_quantity,
+          leftover_percentage: total_issued_quantity
+            ? roundValue((total_leftover_quantity / total_issued_quantity) * 100)
+            : 0,
+          top_item_name: topItem?.item_name || "No item",
+          top_item_quantity: topItem?.actual_quantity || 0,
+          top_item_unit: topItem?.unit || "units",
+        };
+      })
+    : [];
   const issueAssessmentCounts = alerts.reduce((counts, alert) => {
     const key = alert.issue_assessment || "ERROR";
     return {
@@ -266,11 +322,16 @@ export function buildReportInsights(summaries = [], alerts = []) {
     highestCostDay,
     highestWasteDay,
     highestCostPerStudentDay,
+    latestSummary,
     averageDailyCost,
     averageCostPerStudent,
+    budgetRows,
+    latestPlan,
+    consumptionRows,
     mealWatchlist,
     highAlertCount: alerts.filter((alert) => alert.severity === "HIGH").length,
     missingLeftoverCount: alerts.filter((alert) => alert.alert_type === "missing_leftover").length,
     issueAssessmentCounts,
+    anomalyDecisions: alerts.slice(0, 6),
   };
 }

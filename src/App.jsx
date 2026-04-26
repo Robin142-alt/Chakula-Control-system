@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import BackfillImportPage from "./pages/BackfillImportPage.jsx";
 import StudentCountPage from "./pages/StudentCountPage.jsx";
 import AuditLogPage from "./pages/AuditLogPage.jsx";
+import SettingsPage from "./pages/SettingsPage.jsx";
 import { ROLE_ACCESS, USERS } from "../data/demoData.js";
 import { formatAuthMode } from "./lib/authClient.js";
 import {
@@ -19,11 +20,13 @@ import {
   loadAppSnapshot,
   loginWithPin,
   requestBackgroundSync,
+  saveAppSettings,
   saveEntriesLocally,
   saveEntryLocally,
   seedKitchenDb,
   syncUsersFromApi,
 } from "./lib/offlineStore.js";
+import { DEFAULT_APP_SETTINGS } from "./lib/appSettings.js";
 
 const DEFAULT_PAGE = {
   STOREKEEPER: "dashboard",
@@ -56,6 +59,7 @@ export default function App() {
     principal_snapshot: { todays_cost_kes: 0, cost_per_student_kes: 0, alerts: [] },
     report_insights: null,
     activity_feed: [],
+    settings: DEFAULT_APP_SETTINGS,
     queue_count: 0,
     last_sync_at: null,
   });
@@ -191,6 +195,12 @@ export default function App() {
     };
   };
 
+  const handleSaveSettings = async (nextSettings) => {
+    await saveAppSettings(nextSettings);
+    setFeedback("Device settings saved locally.");
+    await refreshAppState({ syncRemoteUsers: false });
+  };
+
   if (!activeUser) {
     return (
       <LoginPage
@@ -198,6 +208,7 @@ export default function App() {
         onLogin={handleLogin}
         isOnline={isOnline}
         feedback={feedback}
+        settings={snapshot.settings}
       />
     );
   }
@@ -213,6 +224,9 @@ export default function App() {
         <div>
           <p className="app-title">Chakula Control</p>
           <h1>Smart Kitchen Accountability System</h1>
+          <p className="session-note">
+            {snapshot.settings.school_name} / {snapshot.settings.kitchen_name}
+          </p>
         </div>
         <div className="session-panel">
           <div>
@@ -270,6 +284,7 @@ export default function App() {
           <StudentCountPage
             activeUser={activeUser}
             studentCounts={snapshot.student_counts}
+            settings={snapshot.settings}
             onSubmit={(payload) => handleSave("student_counts", "/student-count", payload, "Student count saved.")}
             feedback={feedback}
           />
@@ -300,6 +315,14 @@ export default function App() {
             activeUser={activeUser}
             activityFeed={snapshot.activity_feed}
             queueCount={snapshot.queue_count}
+          />
+        )}
+        {activePage === "settings" && (
+          <SettingsPage
+            activeUser={activeUser}
+            settings={snapshot.settings}
+            onSaveSettings={handleSaveSettings}
+            feedback={feedback}
           />
         )}
       </main>

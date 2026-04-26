@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-export default function LoginPage({ users, onLogin, isOnline, feedback }) {
+export default function LoginPage({ users, onLogin, isOnline, feedback, settings }) {
   const [selectedUserId, setSelectedUserId] = useState(users[0]?.id || "");
   const [pin, setPin] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -39,6 +39,9 @@ export default function LoginPage({ users, onLogin, isOnline, feedback }) {
       <section className="login-card">
         <p className="eyebrow">Shared device sign-in</p>
         <h1>Chakula Control</h1>
+        <p className="login-copy">
+          {settings?.school_name || "Demo Boarding School"} / {settings?.kitchen_name || "Main Kitchen"}
+        </p>
         <p className="login-copy">
           Sign in with a simple PIN. If the network drops, this device can still use the last trusted PIN proof.
         </p>

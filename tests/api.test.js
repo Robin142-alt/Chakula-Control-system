@@ -202,5 +202,8 @@ test("reports endpoint returns the full seven-day simulation", async () => {
   assert.equal(response.status, 200);
   assert.equal(body.success, true);
   assert.equal(body.reports.daily_summaries.length, 7);
+  assert.equal(body.reports.report_insights.budgetRows.length, 7);
+  assert.equal(body.reports.report_insights.latestPlan.length, 3);
+  assert.equal(body.reports.report_insights.consumptionRows.length, 3);
   assert.ok(body.reports.generated_insights.length >= 3);
 });

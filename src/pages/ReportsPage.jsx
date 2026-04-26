@@ -7,6 +7,10 @@ export default function ReportsPage({ summaries, alerts, reportInsights }) {
   const highestWasteDay = reportInsights?.highestWasteDay;
   const highestCostPerStudentDay = reportInsights?.highestCostPerStudentDay;
   const watchlist = reportInsights?.mealWatchlist?.slice(0, 6) || [];
+  const budgetRows = reportInsights?.budgetRows || [];
+  const latestPlan = reportInsights?.latestPlan || [];
+  const consumptionRows = reportInsights?.consumptionRows || [];
+  const anomalyDecisions = reportInsights?.anomalyDecisions || [];
 
   return (
     <section className="page-grid">
@@ -21,9 +25,82 @@ export default function ReportsPage({ summaries, alerts, reportInsights }) {
       <div className="metric-grid">
         <MetricCard label="Average Daily Cost" value={reportInsights?.averageDailyCost || 0} />
         <MetricCard label="Avg Cost per Student" value={reportInsights?.averageCostPerStudent || 0} accent="amber" />
-        <MetricCard label="Possible Theft" value={reportInsights?.issueAssessmentCounts?.POSSIBLE_THEFT || 0} type="plain" accent="terracotta" />
-        <MetricCard label="Waste Risks" value={reportInsights?.issueAssessmentCounts?.WASTE || 0} type="plain" accent="slate" />
+        <MetricCard
+          label="Possible Theft"
+          value={reportInsights?.issueAssessmentCounts?.POSSIBLE_THEFT || 0}
+          type="plain"
+          accent="terracotta"
+        />
+        <MetricCard
+          label="Waste Risks"
+          value={reportInsights?.issueAssessmentCounts?.WASTE || 0}
+          type="plain"
+          accent="slate"
+        />
       </div>
+
+      <section className="panel">
+        <div className="panel__header">
+          <h3>Budget tracking</h3>
+          <span>Actual vs planned spend</span>
+        </div>
+        <div className="report-list">
+          {budgetRows.map((row) => (
+            <article key={row.date} className="report-card">
+              <div className="report-card__topline">
+                <strong>{row.date}</strong>
+                <span>{row.status}</span>
+              </div>
+              <p>Actual: {formatKes(row.actual_kes)}</p>
+              <p>Budget: {formatKes(row.budget_kes)}</p>
+              <p>Variance: {formatKes(row.variance_kes)}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel__header">
+          <h3>Expected usage plan</h3>
+          <span>{reportInsights?.latestSummary?.date || "Latest day"}</span>
+        </div>
+        <div className="report-list">
+          {latestPlan.map((meal) => (
+            <article key={meal.meal_type} className="report-card">
+              <div className="report-card__topline">
+                <strong>{formatMealLabel(meal.meal_type)}</strong>
+                <span>{meal.student_count || 0} students</span>
+              </div>
+              <p>Expected cost: {formatKes(meal.expected_cost_kes)}</p>
+              <p>Actual cost: {formatKes(meal.actual_cost_kes)}</p>
+              <p>Variance: {formatKes(meal.variance_kes)}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel__header">
+          <h3>Consumption</h3>
+          <span>Latest day by meal</span>
+        </div>
+        <div className="report-list">
+          {consumptionRows.map((meal) => (
+            <article key={meal.meal_type} className="report-card">
+              <div className="report-card__topline">
+                <strong>{formatMealLabel(meal.meal_type)}</strong>
+                <span>{meal.leftover_percentage}% leftovers</span>
+              </div>
+              <p>Used: {meal.total_actual_quantity} units</p>
+              <p>Expected: {meal.total_expected_quantity} units</p>
+              <p>Leftovers: {meal.total_leftover_quantity} units</p>
+              <p>
+                Top item: {meal.top_item_name} ({meal.top_item_quantity} {meal.top_item_unit})
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <section className="panel">
         <div className="panel__header">
@@ -56,6 +133,14 @@ export default function ReportsPage({ summaries, alerts, reportInsights }) {
 
       <section className="panel">
         <div className="panel__header">
+          <h3>Anomaly decisions</h3>
+          <span>Likely issue and next check</span>
+        </div>
+        <AlertList alerts={anomalyDecisions} emptyMessage="No anomaly decisions right now." />
+      </section>
+
+      <section className="panel">
+        <div className="panel__header">
           <h3>What needs attention</h3>
           <span>Expected vs actual</span>
         </div>
@@ -64,7 +149,7 @@ export default function ReportsPage({ summaries, alerts, reportInsights }) {
             <article key={`${meal.date}-${meal.meal_type}`} className="report-card">
               <div className="report-card__topline">
                 <strong>
-                  {meal.date} • {formatMealLabel(meal.meal_type)}
+                  {meal.date} / {formatMealLabel(meal.meal_type)}
                 </strong>
                 <span>{formatKes(meal.variance_kes)}</span>
               </div>

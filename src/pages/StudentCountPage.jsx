@@ -1,18 +1,25 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fromDateTimeInputValue, toDateTimeInputValue } from "../lib/format.js";
 
 const QUICK_COUNTS = [140, 150, 160, 170, 180, 200];
 
-export default function StudentCountPage({ activeUser, studentCounts, onSubmit, feedback }) {
+export default function StudentCountPage({ activeUser, studentCounts, settings, onSubmit, feedback }) {
   const latestCount = useMemo(
     () => [...studentCounts].sort((left, right) => String(right.date_time).localeCompare(String(left.date_time)))[0] || null,
     [studentCounts],
   );
-  const [studentCount, setStudentCount] = useState(String(Math.round(Number(latestCount?.student_count || 160))));
+  const [studentCount, setStudentCount] = useState(
+    String(Math.round(Number(latestCount?.student_count || settings?.default_student_count || 160))),
+  );
   const [rawInputText, setRawInputText] = useState(latestCount?.raw_input_text || "students present after roll call");
   const [notes, setNotes] = useState("");
   const [enteredLate, setEnteredLate] = useState(false);
   const [manualDateTime, setManualDateTime] = useState(toDateTimeInputValue());
+
+  useEffect(() => {
+    setStudentCount(String(Math.round(Number(latestCount?.student_count || settings?.default_student_count || 160))));
+    setRawInputText(latestCount?.raw_input_text || "students present after roll call");
+  }, [latestCount, settings?.default_student_count]);
 
   if (activeUser.role !== "STOREKEEPER") {
     return <p className="empty-state">Only the storekeeper can capture daily student count here.</p>;
@@ -38,7 +45,7 @@ export default function StudentCountPage({ activeUser, studentCounts, onSubmit, 
     <section className="page-grid">
       <div className="hero-card hero-card--slate">
         <p className="eyebrow">Student count</p>
-        <h2>Record the day’s headcount fast</h2>
+        <h2>Record the day&apos;s headcount fast</h2>
         <p>Cost per student stays useful only when the headcount stays current, even if it comes later from paper.</p>
       </div>
 

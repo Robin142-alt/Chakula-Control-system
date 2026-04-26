@@ -12,6 +12,7 @@ import {
   safeNumber,
 } from "../../data/logic.js";
 import { hashPinBrowser } from "./authClient.js";
+import { DEFAULT_APP_SETTINGS } from "./appSettings.js";
 
 const DB_NAME = "chakula-control-local";
 const DB_VERSION = 1;
@@ -112,6 +113,12 @@ export async function seedKitchenDb() {
   const db = await openKitchenDb();
   const seeded = await db.get("meta", "seeded");
   if (seeded) {
+    if (!(await db.get("meta", "current_session"))) {
+      await db.put("meta", { id: "current_session", value: null });
+    }
+    if (!(await db.get("meta", "app_settings"))) {
+      await db.put("meta", { id: "app_settings", value: DEFAULT_APP_SETTINGS });
+    }
     return;
   }
 
@@ -122,6 +129,7 @@ export async function seedKitchenDb() {
   await tx.objectStore("meta").put({ id: "last_sync_at", value: null });
   await tx.objectStore("meta").put({ id: "active_user_id", value: 1 });
   await tx.objectStore("meta").put({ id: "current_session", value: null });
+  await tx.objectStore("meta").put({ id: "app_settings", value: DEFAULT_APP_SETTINGS });
 
   for (const user of USERS) {
     await tx.objectStore("meta").put({ id: `user:${user.id}`, value: user });
@@ -236,6 +244,27 @@ export async function getCurrentSession() {
   const db = await openKitchenDb();
   const stored = await db.get("meta", "current_session");
   return stored?.value || null;
+}
+
+export async function getAppSettings() {
+  await seedKitchenDb();
+  const db = await openKitchenDb();
+  const stored = await db.get("meta", "app_settings");
+  return {
+    ...DEFAULT_APP_SETTINGS,
+    ...(stored?.value || {}),
+  };
+}
+
+export async function saveAppSettings(nextSettings) {
+  await seedKitchenDb();
+  const db = await openKitchenDb();
+  const merged = {
+    ...DEFAULT_APP_SETTINGS,
+    ...(nextSettings || {}),
+  };
+  await db.put("meta", { id: "app_settings", value: merged });
+  return merged;
 }
 
 async function persistSession(session) {
@@ -361,6 +390,7 @@ export async function loadAppSnapshot() {
       db.getAll("sync_queue"),
       db.get("meta", "last_sync_at"),
     ]);
+  const settingsRow = await db.get("meta", "app_settings");
 
   const inventorySnapshot = buildInventorySnapshot({
     inventory_items,
@@ -411,6 +441,10 @@ export async function loadAppSnapshot() {
     principal_snapshot: buildPrincipalSnapshot(latestSummary, uniqueAlerts),
     report_insights: buildReportInsights(summaries, uniqueAlerts),
     activity_feed: activityFeed,
+    settings: {
+      ...DEFAULT_APP_SETTINGS,
+      ...(settingsRow?.value || {}),
+    },
     queue_count: sync_queue.length,
     last_sync_at: lastSync?.value || null,
   };

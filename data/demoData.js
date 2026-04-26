@@ -5,7 +5,7 @@ export const ROLE_ACCESS = {
   COOK: ["dashboard", "log-leftovers", "inventory", "backfill-import", "reports"],
   ACCOUNTANT: ["dashboard", "inventory", "reports"],
   PRINCIPAL: ["dashboard"],
-  ADMIN: ["dashboard", "inventory", "reports", "audit-log"],
+  ADMIN: ["dashboard", "inventory", "reports", "audit-log", "settings"],
 };
 
 export const USERS = [
