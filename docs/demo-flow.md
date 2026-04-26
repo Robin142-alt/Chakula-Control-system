@@ -31,6 +31,7 @@ Show that the system works in messy school reality:
 10. Switch to the Admin role and open `Audit trail`.
 11. Open `Device settings` and show how one shared phone can still feel local to the school.
 12. End on Reports and explain the seven-day anomaly story through budget, expected usage, and actual consumption.
+13. Use the report actions to export a CSV or print a principal brief for offline handoff.
 
 ## Suggested talking points
 
@@ -44,6 +45,7 @@ Show that the system works in messy school reality:
 - "The system helps separate normal variance from duplicate issues, missing leftovers, and stock mismatches."
 - "Each alert is translated into likely waste, recording error, or possible theft with a next check to do."
 - "Reports are not just raw exports. They show budget tracking, expected usage, consumption, and anomaly decisions in plain language."
+- "When the principal or accountant still wants paper, one tap prints a short brief or downloads the CSV."
 
 ## Screenshot set
 

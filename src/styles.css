@@ -224,7 +224,8 @@ button {
 .inventory-grid,
 .meal-grid,
 .quick-action-grid,
-.chip-grid {
+.chip-grid,
+.action-grid {
   display: grid;
   gap: 0.8rem;
 }
@@ -550,9 +551,13 @@ button {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .quick-action-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.quick-action-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.action-grid {
+  grid-template-columns: 1fr;
+}
 
   .meal-grid,
   .inventory-grid {
@@ -561,5 +566,9 @@ button {
 
   .metric-grid--import {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

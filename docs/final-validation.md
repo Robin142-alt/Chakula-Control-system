@@ -35,6 +35,7 @@ Checked frontend shell successfully:
 - Admin settings screen bundled successfully
 - CSV backfill page bundled successfully
 - Reports page bundled with explicit budget, expected usage, consumption, and anomaly sections
+- Export actions bundled for daily CSV, alerts CSV, and printable principal brief
 
 Generated demo screenshots successfully:
 
@@ -87,6 +88,7 @@ Runtime diagnostics note:
   - Item chips, meal chips, quantity presets, and auto timestamps reduce input effort.
   - Shared-device login uses short PINs.
   - CSV backfill supports pasted paper records instead of manual re-entry.
+  - Backfill template download and sample reset reduce formatting mistakes.
 
 - Meaningful insights:
   - Daily cost
@@ -100,6 +102,7 @@ Runtime diagnostics note:
   - Weekly meal watchlist
   - Admin activity trail for who captured what
   - Likely issue labels: waste, error, or possible theft
+  - Printable principal brief and CSV handoff for offline review
 
 - Demo data feels real:
   - Kenyan staple inventory

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { BACKFILL_TEMPLATE, normalizeBackfillRows, parseCsvText } from "../lib/csv.js";
+import { downloadTextFile } from "../lib/export.js";
 
 export default function BackfillImportPage({ activeUser, inventoryItems, onImport, feedback }) {
   const [csvText, setCsvText] = useState(BACKFILL_TEMPLATE);
@@ -31,6 +32,16 @@ export default function BackfillImportPage({ activeUser, inventoryItems, onImpor
     setLocalMessage(`Imported ${result.importedCount} row${result.importedCount === 1 ? "" : "s"} into the local queue.`);
   };
 
+  const handleDownloadTemplate = () => {
+    downloadTextFile("chakula-backfill-template.csv", BACKFILL_TEMPLATE, "text/csv;charset=utf-8");
+    setLocalMessage("Backfill template downloaded for paper-to-CSV cleanup.");
+  };
+
+  const handleResetTemplate = () => {
+    setCsvText(BACKFILL_TEMPLATE);
+    setLocalMessage("Template restored.");
+  };
+
   return (
     <section className="page-grid">
       <div className="hero-card hero-card--reports">
@@ -57,9 +68,17 @@ export default function BackfillImportPage({ activeUser, inventoryItems, onImpor
           <textarea rows="12" value={csvText} onChange={(event) => setCsvText(event.target.value)} />
         </label>
 
-        <button className="primary-button" type="button" onClick={handleImport}>
-          Import to local queue
-        </button>
+        <div className="action-grid">
+          <button className="primary-button" type="button" onClick={handleImport}>
+            Import to local queue
+          </button>
+          <button className="secondary-button" type="button" onClick={handleDownloadTemplate}>
+            Download template
+          </button>
+          <button className="secondary-button" type="button" onClick={handleResetTemplate}>
+            Reset sample
+          </button>
+        </div>
         {(localMessage || feedback) && <p className="feedback-line">{localMessage || feedback}</p>}
       </section>
 
@@ -109,4 +128,3 @@ export default function BackfillImportPage({ activeUser, inventoryItems, onImpor
     </section>
   );
 }
-

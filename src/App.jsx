@@ -308,6 +308,7 @@ export default function App() {
             summaries={snapshot.summaries}
             alerts={snapshot.alerts}
             reportInsights={snapshot.report_insights}
+            settings={snapshot.settings}
           />
         )}
         {activePage === "audit-log" && (

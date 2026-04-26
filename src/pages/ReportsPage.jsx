@@ -1,16 +1,82 @@
+import { useState } from "react";
 import AlertList from "../components/AlertList.jsx";
 import MetricCard from "../components/MetricCard.jsx";
+import {
+  buildAlertExportRows,
+  buildCsv,
+  buildDailySummaryExportRows,
+  buildPrincipalBriefHtml,
+  downloadTextFile,
+  printHtmlDocument,
+} from "../lib/export.js";
 import { formatKes, formatMealLabel } from "../lib/format.js";
 
-export default function ReportsPage({ summaries, alerts, reportInsights }) {
+export default function ReportsPage({ summaries, alerts, reportInsights, settings }) {
+  const [exportMessage, setExportMessage] = useState("");
   const highestCostDay = reportInsights?.highestCostDay;
   const highestWasteDay = reportInsights?.highestWasteDay;
   const highestCostPerStudentDay = reportInsights?.highestCostPerStudentDay;
+  const latestSummary = reportInsights?.latestSummary || summaries[summaries.length - 1] || null;
   const watchlist = reportInsights?.mealWatchlist?.slice(0, 6) || [];
   const budgetRows = reportInsights?.budgetRows || [];
   const latestPlan = reportInsights?.latestPlan || [];
   const consumptionRows = reportInsights?.consumptionRows || [];
   const anomalyDecisions = reportInsights?.anomalyDecisions || [];
+  const summaryDate = latestSummary?.date || "latest";
+
+  const handleExportSummaries = () => {
+    const rows = buildDailySummaryExportRows(summaries);
+    const csv = buildCsv(
+      [
+        "date",
+        "meal_type",
+        "student_count",
+        "total_cost_kes",
+        "meal_cost_kes",
+        "expected_cost_kes",
+        "variance_kes",
+        "waste_estimate_kes",
+        "alert_count",
+      ],
+      rows,
+    );
+    downloadTextFile(`chakula-daily-summaries-${summaryDate}.csv`, csv, "text/csv;charset=utf-8");
+    setExportMessage("Daily summary CSV downloaded for accountant follow-up.");
+  };
+
+  const handleExportAlerts = () => {
+    const rows = buildAlertExportRows(alerts);
+    const csv = buildCsv(
+      [
+        "date",
+        "severity",
+        "alert_type",
+        "meal_type",
+        "item_id",
+        "title",
+        "message",
+        "issue_assessment",
+        "action_hint",
+      ],
+      rows,
+    );
+    downloadTextFile(`chakula-alerts-${summaryDate}.csv`, csv, "text/csv;charset=utf-8");
+    setExportMessage("Alerts CSV downloaded with likely issue labels.");
+  };
+
+  const handlePrintBrief = () => {
+    const documentHtml = buildPrincipalBriefHtml({
+      settings,
+      summary: latestSummary,
+      alerts,
+    });
+    const opened = printHtmlDocument(documentHtml);
+    setExportMessage(
+      opened
+        ? "Principal brief opened for printing."
+        : "Print window was blocked. Allow popups and try again.",
+    );
+  };
 
   return (
     <section className="page-grid">
@@ -38,6 +104,25 @@ export default function ReportsPage({ summaries, alerts, reportInsights }) {
           accent="slate"
         />
       </div>
+
+      <section className="panel">
+        <div className="panel__header">
+          <h3>Exports and handoff</h3>
+          <span>Offline-friendly</span>
+        </div>
+        <div className="action-grid">
+          <button className="secondary-button" type="button" onClick={handleExportSummaries}>
+            Export daily CSV
+          </button>
+          <button className="secondary-button" type="button" onClick={handleExportAlerts}>
+            Export alerts CSV
+          </button>
+          <button className="primary-button primary-button--slate" type="button" onClick={handlePrintBrief}>
+            Print principal brief
+          </button>
+        </div>
+        {exportMessage && <p className="feedback-line">{exportMessage}</p>}
+      </section>
 
       <section className="panel">
         <div className="panel__header">
