@@ -21,8 +21,8 @@ export default function ReportsPage({ summaries, alerts, reportInsights }) {
       <div className="metric-grid">
         <MetricCard label="Average Daily Cost" value={reportInsights?.averageDailyCost || 0} />
         <MetricCard label="Avg Cost per Student" value={reportInsights?.averageCostPerStudent || 0} accent="amber" />
-        <MetricCard label="High Alerts" value={reportInsights?.highAlertCount || 0} type="plain" accent="terracotta" />
-        <MetricCard label="Missing Leftovers" value={reportInsights?.missingLeftoverCount || 0} type="plain" accent="slate" />
+        <MetricCard label="Possible Theft" value={reportInsights?.issueAssessmentCounts?.POSSIBLE_THEFT || 0} type="plain" accent="terracotta" />
+        <MetricCard label="Waste Risks" value={reportInsights?.issueAssessmentCounts?.WASTE || 0} type="plain" accent="slate" />
       </div>
 
       <section className="panel">
@@ -73,6 +73,36 @@ export default function ReportsPage({ summaries, alerts, reportInsights }) {
               <p>Waste estimate: {formatKes(meal.waste_estimate_kes)}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel__header">
+          <h3>Likely issue mix</h3>
+          <span>School-friendly language</span>
+        </div>
+        <div className="report-list">
+          <article className="report-card">
+            <div className="report-card__topline">
+              <strong>Possible theft</strong>
+              <span>{reportInsights?.issueAssessmentCounts?.POSSIBLE_THEFT || 0}</span>
+            </div>
+            <p>Usually driven by serious stock mismatch after count.</p>
+          </article>
+          <article className="report-card">
+            <div className="report-card__topline">
+              <strong>Waste</strong>
+              <span>{reportInsights?.issueAssessmentCounts?.WASTE || 0}</span>
+            </div>
+            <p>Usually driven by consumption above plan or unusual leftover cost.</p>
+          </article>
+          <article className="report-card">
+            <div className="report-card__topline">
+              <strong>Recording error</strong>
+              <span>{reportInsights?.issueAssessmentCounts?.ERROR || 0}</span>
+            </div>
+            <p>Usually driven by missing leftovers, duplicate issues, or low consumption gaps.</p>
+          </article>
         </div>
       </section>
 

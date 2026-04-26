@@ -250,6 +250,17 @@ export function buildReportInsights(summaries = [], alerts = []) {
         summaries.reduce((total, summary) => total + safeNumber(summary.cost_per_student_kes), 0) / summaries.length,
       )
     : 0;
+  const issueAssessmentCounts = alerts.reduce((counts, alert) => {
+    const key = alert.issue_assessment || "ERROR";
+    return {
+      ...counts,
+      [key]: safeNumber(counts[key]) + 1,
+    };
+  }, {
+    WASTE: 0,
+    ERROR: 0,
+    POSSIBLE_THEFT: 0,
+  });
 
   return {
     highestCostDay,
@@ -260,5 +271,6 @@ export function buildReportInsights(summaries = [], alerts = []) {
     mealWatchlist,
     highAlertCount: alerts.filter((alert) => alert.severity === "HIGH").length,
     missingLeftoverCount: alerts.filter((alert) => alert.alert_type === "missing_leftover").length,
+    issueAssessmentCounts,
   };
 }

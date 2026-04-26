@@ -192,6 +192,7 @@ test("principal alerts endpoint stays limited to high-severity items", async () 
   assert.equal(body.success, true);
   assert.ok(body.alerts.length <= 3);
   assert.ok(body.alerts.every((alert) => alert.severity === "HIGH"));
+  assert.ok(body.alerts.every((alert) => alert.issue_assessment));
 });
 
 test("reports endpoint returns the full seven-day simulation", async () => {

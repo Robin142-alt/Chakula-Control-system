@@ -454,6 +454,20 @@ button {
   margin-bottom: 0.2rem;
 }
 
+.alert-card__assessment,
+.alert-card__hint {
+  margin-bottom: 0;
+}
+
+.alert-card__assessment {
+  font-size: 0.9rem;
+}
+
+.alert-card__hint {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .report-card__meals {
   display: flex;
   flex-wrap: wrap;

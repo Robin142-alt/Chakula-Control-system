@@ -13,9 +13,14 @@ export default function AlertList({ alerts, emptyMessage = "No alerts right now.
           </div>
           <strong>{alert.title}</strong>
           <p>{alert.message}</p>
+          {alert.issue_assessment && (
+            <p className="alert-card__assessment">
+              Likely issue: <strong>{String(alert.issue_assessment).replaceAll("_", " ")}</strong>
+            </p>
+          )}
+          {alert.action_hint && <p className="alert-card__hint">{alert.action_hint}</p>}
         </article>
       ))}
     </div>
   );
 }
-

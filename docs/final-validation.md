@@ -92,6 +92,7 @@ Runtime diagnostics note:
   - Top alerts by severity
   - Weekly meal watchlist
   - Admin activity trail for who captured what
+  - Likely issue labels: waste, error, or possible theft
 
 - Demo data feels real:
   - Kenyan staple inventory

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { DEMO_DATA } from "../data/demoData.js";
 import { buildActivityFeed, buildInventorySnapshot, buildReportInsights } from "../data/derivedData.js";
 import {
+  assessAlert,
   buildDailySummaries,
   buildPrincipalSnapshot,
   calculateConsumption,
@@ -29,6 +30,23 @@ test("demo dataset produces all required anomaly types", () => {
   assert.ok(alertTypes.has("missing_leftover"));
   assert.ok(alertTypes.has("stock_mismatch"));
   assert.ok(alertTypes.has("abnormal_consumption"));
+});
+
+test("alert assessments translate anomalies into waste, error, or possible theft", () => {
+  const duplicateAlert = assessAlert({ alert_type: "duplicate_issue", severity: "HIGH" });
+  const missingLeftoverAlert = assessAlert({ alert_type: "missing_leftover", severity: "MEDIUM" });
+  const theftAlert = assessAlert({ alert_type: "stock_mismatch", severity: "HIGH", variance_quantity: -18 });
+  const wasteAlert = assessAlert({
+    alert_type: "abnormal_consumption",
+    severity: "HIGH",
+    actual_cost_kes: 6200,
+    expected_cost_kes: 5000,
+  });
+
+  assert.equal(duplicateAlert.issue_assessment, "ERROR");
+  assert.equal(missingLeftoverAlert.issue_assessment, "ERROR");
+  assert.equal(theftAlert.issue_assessment, "POSSIBLE_THEFT");
+  assert.equal(wasteAlert.issue_assessment, "WASTE");
 });
 
 test("daily summaries collapse to the expected seven demo days", () => {
@@ -88,6 +106,8 @@ test("report insights highlight cost, waste, and missing leftover pressure point
   assert.equal(insights.highestWasteDay?.date, "2026-04-23");
   assert.ok(insights.highAlertCount >= 1);
   assert.ok(insights.missingLeftoverCount >= 2);
+  assert.ok(insights.issueAssessmentCounts.POSSIBLE_THEFT >= 1);
+  assert.ok(insights.issueAssessmentCounts.ERROR >= 1);
   assert.ok(insights.mealWatchlist.length >= 1);
 });
 

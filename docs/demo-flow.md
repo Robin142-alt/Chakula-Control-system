@@ -40,6 +40,7 @@ Show that the system works in messy school reality:
 - "The Principal sees only the essentials, not a complicated stock screen."
 - "Admin can still trace late entries, conflicts, and alerts without touching the kitchen workflow."
 - "The system helps separate normal variance from duplicate issues, missing leftovers, and stock mismatches."
+- "Each alert is translated into likely waste, recording error, or possible theft with a next check to do."
 
 ## Screenshot set
 

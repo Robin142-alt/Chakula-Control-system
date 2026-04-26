@@ -13,6 +13,7 @@ Offline-first Smart Kitchen Accountability System built for low-resource boardin
 - Dedicated daily student count capture for cost-per-student accuracy
 - Admin audit trail view built from local-first activity records
 - CSV backfill import for paper records and late entry cleanup
+- Alerts translated into likely `WASTE`, `ERROR`, or `POSSIBLE_THEFT`
 - Seven-day Kenyan demo dataset with realistic items, KES pricing, anomalies, and cost outputs
 
 ## Quick start

@@ -100,8 +100,50 @@ function buildGroupedTotals(records, quantityField = "quantity") {
   return grouped;
 }
 
+export function assessAlert(alert) {
+  if (!alert) {
+    return null;
+  }
+
+  if (alert.issue_assessment && alert.action_hint) {
+    return alert;
+  }
+
+  const actualCost = safeNumber(alert.actual_cost_kes);
+  const expectedCost = safeNumber(alert.expected_cost_kes);
+  const varianceQuantity = safeNumber(alert.variance_quantity);
+  let issueAssessment = "ERROR";
+  let actionHint = "Review the record and compare it with the paper note or bin card.";
+
+  if (alert.alert_type === "duplicate_issue") {
+    issueAssessment = "ERROR";
+    actionHint = "Check for a duplicate paper entry before issuing more stock.";
+  } else if (alert.alert_type === "missing_leftover") {
+    issueAssessment = "ERROR";
+    actionHint = "Ask the cook whether leftovers existed or the leftover log was skipped.";
+  } else if (alert.alert_type === "stock_mismatch") {
+    issueAssessment = alert.severity === "HIGH" || varianceQuantity < 0 ? "POSSIBLE_THEFT" : "ERROR";
+    actionHint =
+      issueAssessment === "POSSIBLE_THEFT"
+        ? "Recount physical stock, compare with the bin card, and check who handled the item."
+        : "Repeat the count and correct the record if it was a counting error.";
+  } else if (alert.alert_type === "abnormal_consumption") {
+    issueAssessment = actualCost > expectedCost ? "WASTE" : "ERROR";
+    actionHint =
+      issueAssessment === "WASTE"
+        ? "Review portions, preparation losses, and whether too much stock was issued."
+        : "Check whether some issues or leftovers were recorded late or missed.";
+  }
+
+  return {
+    ...alert,
+    issue_assessment: issueAssessment,
+    action_hint: actionHint,
+  };
+}
+
 export function sortAlerts(alerts) {
-  return [...alerts].sort((left, right) => {
+  return [...alerts].map(assessAlert).sort((left, right) => {
     const leftSeverity = SEVERITY_RANK[left.severity] || 0;
     const rightSeverity = SEVERITY_RANK[right.severity] || 0;
 
@@ -178,6 +220,7 @@ export function detectAnomaliesFromRecords({
       severity: "HIGH",
       title: `${item?.name || "Item"} issued twice`,
       message: `${item?.name || "Item"} was issued ${records.length} times for ${mealType.toLowerCase()} on ${dateKey}.`,
+      duplicate_count: records.length,
       item_id: Number(itemId) || null,
       meal_type: mealType,
       date_time: records[records.length - 1].date_time,
@@ -225,6 +268,9 @@ export function detectAnomaliesFromRecords({
       message: `Counted ${record.counted_quantity ?? 0} against system ${record.system_quantity ?? 0} for ${
         inventoryMap.get(record.item_id)?.name || "this item"
       }.`,
+      counted_quantity: record.counted_quantity ?? null,
+      system_quantity: record.system_quantity ?? null,
+      variance_quantity: record.variance_quantity ?? null,
       item_id: record.item_id ?? null,
       meal_type: normalizeMealType(record.meal_type),
       date_time: record.date_time,
@@ -262,6 +308,9 @@ export function detectAnomaliesFromRecords({
         severity: Math.abs(1 - ratio) > 0.2 ? "HIGH" : "LOW",
         title: `${mealType.toLowerCase()} consumption out of range`,
         message: `Actual cost was KES ${roundValue(actualCost)} against expected KES ${roundValue(expectedCost)} on ${dateKey}.`,
+        actual_cost_kes: roundValue(actualCost),
+        expected_cost_kes: roundValue(expectedCost),
+        variance_kes: roundValue(actualCost - expectedCost),
         item_id: null,
         meal_type: mealType,
         date_time: `${dateKey}T23:00:00+03:00`,
