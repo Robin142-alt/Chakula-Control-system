@@ -1,0 +1,432 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI Variable", "Segoe UI", "Noto Sans", sans-serif;
+  --bg: #f5f0e6;
+  --surface: rgba(255, 252, 247, 0.94);
+  --surface-strong: #ffffff;
+  --text: #1d2a24;
+  --muted: #5d6b64;
+  --line: rgba(33, 59, 45, 0.12);
+  --green: #1f5f3a;
+  --green-soft: #dff0df;
+  --amber: #d9972b;
+  --amber-soft: #f7ead0;
+  --terracotta: #b65c3a;
+  --terracotta-soft: #f7dfd5;
+  --slate: #355569;
+  --slate-soft: #dce9f3;
+  --danger: #9f2d2d;
+  --shadow: 0 18px 40px rgba(38, 46, 36, 0.08);
+  background:
+    radial-gradient(circle at top left, rgba(241, 208, 123, 0.28), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(75, 130, 91, 0.18), transparent 35%),
+    linear-gradient(180deg, #f8f4ea 0%, #f0ebe0 100%);
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: transparent;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 1rem 1rem 6rem;
+}
+
+.app-header {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.app-title,
+.eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-header h1,
+.hero-card h2,
+.panel h3 {
+  margin: 0;
+}
+
+.session-picker {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.session-picker select,
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  padding: 0.9rem 1rem;
+  background: var(--surface-strong);
+}
+
+.status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.status-pill--online,
+.status-pill--healthy,
+.metric-card--green {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.status-pill--offline,
+.alert-card--high {
+  background: #f8d8d3;
+  color: var(--danger);
+}
+
+.status-pill--watch,
+.metric-card--amber,
+.alert-card--medium {
+  background: var(--amber-soft);
+  color: #8b5b08;
+}
+
+.status-pill--low,
+.metric-card--slate,
+.alert-card--low {
+  background: var(--slate-soft);
+  color: var(--slate);
+}
+
+.status-note {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.feedback-banner,
+.hero-card,
+.panel,
+.metric-card,
+.inventory-card,
+.report-card,
+.meal-card {
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.feedback-banner {
+  margin-bottom: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  color: var(--green);
+}
+
+.app-main,
+.page-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-card {
+  padding: 1.2rem;
+  border-radius: 1.4rem;
+}
+
+.hero-card--cook {
+  background: linear-gradient(135deg, rgba(208, 153, 43, 0.18), rgba(255, 252, 247, 0.98));
+}
+
+.hero-card--inventory {
+  background: linear-gradient(135deg, rgba(31, 95, 58, 0.14), rgba(255, 252, 247, 0.98));
+}
+
+.hero-card--reports {
+  background: linear-gradient(135deg, rgba(53, 85, 105, 0.14), rgba(255, 252, 247, 0.98));
+}
+
+.hero-card--count {
+  background: linear-gradient(135deg, rgba(182, 92, 58, 0.16), rgba(255, 252, 247, 0.98));
+}
+
+.metric-grid,
+.inventory-grid,
+.meal-grid,
+.quick-action-grid,
+.chip-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.metric-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metric-card {
+  border-radius: 1.2rem;
+  padding: 1rem;
+}
+
+.metric-card__label {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+}
+
+.metric-card__value {
+  font-size: 1.5rem;
+}
+
+.panel {
+  padding: 1rem;
+  border-radius: 1.3rem;
+}
+
+.panel__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: baseline;
+  margin-bottom: 0.8rem;
+}
+
+.panel__header span {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.quick-action {
+  border: none;
+  border-radius: 1rem;
+  padding: 1rem;
+  background: var(--green);
+  color: white;
+  font-weight: 700;
+}
+
+.quick-action--secondary {
+  background: #264b3a;
+}
+
+.chip-grid {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  background: #fffdf9;
+  color: var(--text);
+}
+
+.chip--active {
+  background: var(--green);
+  color: white;
+  border-color: transparent;
+}
+
+.form-panel {
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field span {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.switch-field {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--text);
+}
+
+.primary-button {
+  width: 100%;
+  border: none;
+  border-radius: 1rem;
+  padding: 1rem;
+  background: var(--green);
+  color: white;
+  font-weight: 800;
+}
+
+.primary-button--cook {
+  background: #8b5b08;
+}
+
+.feedback-line,
+.empty-state,
+.inventory-card__note {
+  color: var(--muted);
+}
+
+.meal-card,
+.inventory-card,
+.report-card {
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.inventory-grid,
+.report-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.inventory-card__topline,
+.report-card__topline,
+.alert-card__topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.status-pill--low,
+.status-pill--watch,
+.status-pill--healthy {
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.count-hint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  background: #fcfaf6;
+  border: 1px dashed var(--line);
+}
+
+.alert-stack {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.alert-card {
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+}
+
+.alert-card strong,
+.report-card strong,
+.inventory-card strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.report-card__meals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  background: rgba(250, 245, 236, 0.96);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
+}
+
+.bottom-nav__button {
+  border: none;
+  border-radius: 0.9rem;
+  padding: 0.85rem 0.5rem;
+  background: transparent;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.bottom-nav__button--active {
+  background: var(--green);
+  color: white;
+  font-weight: 700;
+}
+
+@media (min-width: 720px) {
+  .app-shell {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-bottom: 7rem;
+  }
+
+  .app-header {
+    grid-template-columns: 1.4fr 0.7fr;
+    align-items: end;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .quick-action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .meal-grid,
+  .inventory-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+

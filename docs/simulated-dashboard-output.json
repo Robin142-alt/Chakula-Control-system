@@ -1,0 +1,1402 @@
+{
+  "generated_at": "2026-04-26T00:13:08.178Z",
+  "seven_day_summary": [
+    {
+      "date": "2026-04-20",
+      "student_count": 158,
+      "total_cost_kes": 10884.82,
+      "total_expected_cost_kes": 11185.64,
+      "cost_per_student_kes": 68.89,
+      "waste_estimate_kes": 300.82,
+      "meal_summaries": [
+        {
+          "meal_type": "BREAKFAST",
+          "cost_kes": 476.68,
+          "expected_cost_kes": 537.2,
+          "variance_kes": -60.52,
+          "waste_estimate_kes": 60.52,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 7.9,
+              "leftover_quantity": 0.89,
+              "actual_quantity": 7.01,
+              "expected_quantity": 7.9,
+              "leftover_percentage": 11.27,
+              "actual_cost_kes": 476.68,
+              "expected_cost_kes": 537.2
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            }
+          ]
+        },
+        {
+          "meal_type": "LUNCH",
+          "cost_kes": 4752.19,
+          "expected_cost_kes": 4992.49,
+          "variance_kes": -240.3,
+          "waste_estimate_kes": 240.3,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 25.68,
+              "leftover_quantity": 0,
+              "actual_quantity": 25.68,
+              "expected_quantity": 25.68,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1746.24,
+              "expected_cost_kes": 1746.24
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 16.79,
+              "leftover_quantity": 1.78,
+              "actual_quantity": 15.01,
+              "expected_quantity": 16.79,
+              "leftover_percentage": 10.6,
+              "actual_cost_kes": 2026.35,
+              "expected_cost_kes": 2266.65
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 3.16,
+              "leftover_quantity": 0,
+              "actual_quantity": 3.16,
+              "expected_quantity": 3.16,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 979.6,
+              "expected_cost_kes": 979.6
+            }
+          ]
+        },
+        {
+          "meal_type": "DINNER",
+          "cost_kes": 5655.95,
+          "expected_cost_kes": 5655.95,
+          "variance_kes": 0,
+          "waste_estimate_kes": 0,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 11.85,
+              "leftover_quantity": 0,
+              "actual_quantity": 11.85,
+              "expected_quantity": 11.85,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1599.75,
+              "expected_cost_kes": 1599.75
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 21.73,
+              "leftover_quantity": 0,
+              "actual_quantity": 21.73,
+              "expected_quantity": 21.73,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 3259.5,
+              "expected_cost_kes": 3259.5
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 2.57,
+              "leftover_quantity": 0,
+              "actual_quantity": 2.57,
+              "expected_quantity": 2.57,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 796.7,
+              "expected_cost_kes": 796.7
+            }
+          ]
+        }
+      ],
+      "alerts": [
+        {
+          "id": 8006,
+          "alert_type": "missing_leftover",
+          "severity": "MEDIUM",
+          "title": "No leftovers logged for dinner",
+          "message": "No leftovers were logged for dinner on 2026-04-20.",
+          "item_id": 102,
+          "meal_type": "DINNER",
+          "status": "OPEN",
+          "source_record_type": "issue_logs",
+          "source_record_id": 3005,
+          "date_time": "2026-04-20T16:35:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "No leftovers were logged for dinner on 2026-04-20.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        }
+      ]
+    },
+    {
+      "date": "2026-04-21",
+      "student_count": 160,
+      "total_cost_kes": 11912.94,
+      "total_expected_cost_kes": 11325,
+      "cost_per_student_kes": 74.46,
+      "waste_estimate_kes": 514.2,
+      "meal_summaries": [
+        {
+          "meal_type": "BREAKFAST",
+          "cost_kes": 493.68,
+          "expected_cost_kes": 544,
+          "variance_kes": -50.32,
+          "waste_estimate_kes": 61.2,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 8.16,
+              "leftover_quantity": 0.9,
+              "actual_quantity": 7.26,
+              "expected_quantity": 8,
+              "leftover_percentage": 11.03,
+              "actual_cost_kes": 493.68,
+              "expected_cost_kes": 544
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            }
+          ]
+        },
+        {
+          "meal_type": "LUNCH",
+          "cost_kes": 5789.36,
+          "expected_cost_kes": 5055,
+          "variance_kes": 734.36,
+          "waste_estimate_kes": 243,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 26.52,
+              "leftover_quantity": 0,
+              "actual_quantity": 26.52,
+              "expected_quantity": 26,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1803.36,
+              "expected_cost_kes": 1768
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 23.84,
+              "leftover_quantity": 1.8,
+              "actual_quantity": 22.04,
+              "expected_quantity": 17,
+              "leftover_percentage": 7.55,
+              "actual_cost_kes": 2975.4,
+              "expected_cost_kes": 2295
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 3.26,
+              "leftover_quantity": 0,
+              "actual_quantity": 3.26,
+              "expected_quantity": 3.2,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1010.6,
+              "expected_cost_kes": 992
+            }
+          ]
+        },
+        {
+          "meal_type": "DINNER",
+          "cost_kes": 5629.9,
+          "expected_cost_kes": 5726,
+          "variance_kes": -96.1,
+          "waste_estimate_kes": 210,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 12.24,
+              "leftover_quantity": 0,
+              "actual_quantity": 12.24,
+              "expected_quantity": 12,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1652.4,
+              "expected_cost_kes": 1620
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 22.44,
+              "leftover_quantity": 1.4,
+              "actual_quantity": 21.04,
+              "expected_quantity": 22,
+              "leftover_percentage": 6.24,
+              "actual_cost_kes": 3156,
+              "expected_cost_kes": 3300
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 2.65,
+              "leftover_quantity": 0,
+              "actual_quantity": 2.65,
+              "expected_quantity": 2.6,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 821.5,
+              "expected_cost_kes": 806
+            }
+          ]
+        }
+      ],
+      "alerts": [
+        {
+          "id": 8003,
+          "alert_type": "duplicate_issue",
+          "severity": "HIGH",
+          "title": "Beans issued twice",
+          "message": "Beans was issued 2 times for lunch on 2026-04-21.",
+          "item_id": 102,
+          "meal_type": "LUNCH",
+          "status": "OPEN",
+          "source_record_type": "issue_logs",
+          "source_record_id": 3015,
+          "date_time": "2026-04-21T11:20:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "Beans was issued 2 times for lunch on 2026-04-21.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        }
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "student_count": 162,
+      "total_cost_kes": 10847.87,
+      "total_expected_cost_kes": 11580.41,
+      "cost_per_student_kes": 66.96,
+      "waste_estimate_kes": 274.88,
+      "meal_summaries": [
+        {
+          "meal_type": "BREAKFAST",
+          "cost_kes": 472.6,
+          "expected_cost_kes": 556.24,
+          "variance_kes": -83.64,
+          "waste_estimate_kes": 61.88,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 7.86,
+              "leftover_quantity": 0.91,
+              "actual_quantity": 6.95,
+              "expected_quantity": 8.18,
+              "leftover_percentage": 11.58,
+              "actual_cost_kes": 472.6,
+              "expected_cost_kes": 556.24
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            }
+          ]
+        },
+        {
+          "meal_type": "LUNCH",
+          "cost_kes": 4964.62,
+          "expected_cost_kes": 5168.12,
+          "variance_kes": -203.5,
+          "waste_estimate_kes": 0,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 25.54,
+              "leftover_quantity": 0,
+              "actual_quantity": 25.54,
+              "expected_quantity": 26.59,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1736.72,
+              "expected_cost_kes": 1808.12
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 16.7,
+              "leftover_quantity": 0,
+              "actual_quantity": 16.7,
+              "expected_quantity": 17.38,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 2254.5,
+              "expected_cost_kes": 2346.3
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 3.14,
+              "leftover_quantity": 0,
+              "actual_quantity": 3.14,
+              "expected_quantity": 3.27,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 973.4,
+              "expected_cost_kes": 1013.7
+            }
+          ]
+        },
+        {
+          "meal_type": "DINNER",
+          "cost_kes": 5410.65,
+          "expected_cost_kes": 5856.05,
+          "variance_kes": -445.4,
+          "waste_estimate_kes": 213,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 11.79,
+              "leftover_quantity": 0,
+              "actual_quantity": 11.79,
+              "expected_quantity": 12.27,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1591.65,
+              "expected_cost_kes": 1656.45
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 21.61,
+              "leftover_quantity": 1.42,
+              "actual_quantity": 20.19,
+              "expected_quantity": 22.5,
+              "leftover_percentage": 6.57,
+              "actual_cost_kes": 3028.5,
+              "expected_cost_kes": 3375
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 2.55,
+              "leftover_quantity": 0,
+              "actual_quantity": 2.55,
+              "expected_quantity": 2.66,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 790.5,
+              "expected_cost_kes": 824.6
+            }
+          ]
+        }
+      ],
+      "alerts": [
+        {
+          "id": 8005,
+          "alert_type": "missing_leftover",
+          "severity": "MEDIUM",
+          "title": "No leftovers logged for lunch",
+          "message": "No leftovers were logged for lunch on 2026-04-22.",
+          "item_id": 101,
+          "meal_type": "LUNCH",
+          "status": "OPEN",
+          "source_record_type": "issue_logs",
+          "source_record_id": 3017,
+          "date_time": "2026-04-22T10:55:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "No leftovers were logged for lunch on 2026-04-22.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        }
+      ]
+    },
+    {
+      "date": "2026-04-23",
+      "student_count": 170,
+      "total_cost_kes": 14855.99,
+      "total_expected_cost_kes": 12755.47,
+      "cost_per_student_kes": 87.39,
+      "waste_estimate_kes": 546.63,
+      "meal_summaries": [
+        {
+          "meal_type": "BREAKFAST",
+          "cost_kes": 674.56,
+          "expected_cost_kes": 612.68,
+          "variance_kes": 61.88,
+          "waste_estimate_kes": 65.28,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 10.88,
+              "leftover_quantity": 0.96,
+              "actual_quantity": 9.92,
+              "expected_quantity": 9.01,
+              "leftover_percentage": 8.82,
+              "actual_cost_kes": 674.56,
+              "expected_cost_kes": 612.68
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            }
+          ]
+        },
+        {
+          "meal_type": "LUNCH",
+          "cost_kes": 6616.33,
+          "expected_cost_kes": 5692.29,
+          "variance_kes": 924.04,
+          "waste_estimate_kes": 257.85,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 35.36,
+              "leftover_quantity": 0,
+              "actual_quantity": 35.36,
+              "expected_quantity": 29.28,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 2404.48,
+              "expected_cost_kes": 1991.04
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 23.12,
+              "leftover_quantity": 1.91,
+              "actual_quantity": 21.21,
+              "expected_quantity": 19.15,
+              "leftover_percentage": 8.26,
+              "actual_cost_kes": 2863.35,
+              "expected_cost_kes": 2585.25
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 4.35,
+              "leftover_quantity": 0,
+              "actual_quantity": 4.35,
+              "expected_quantity": 3.6,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1348.5,
+              "expected_cost_kes": 1116
+            }
+          ]
+        },
+        {
+          "meal_type": "DINNER",
+          "cost_kes": 7565.1,
+          "expected_cost_kes": 6450.5,
+          "variance_kes": 1114.6,
+          "waste_estimate_kes": 223.5,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 16.32,
+              "leftover_quantity": 0,
+              "actual_quantity": 16.32,
+              "expected_quantity": 13.52,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 2203.2,
+              "expected_cost_kes": 1825.2
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 29.92,
+              "leftover_quantity": 1.49,
+              "actual_quantity": 28.43,
+              "expected_quantity": 24.78,
+              "leftover_percentage": 4.98,
+              "actual_cost_kes": 4264.5,
+              "expected_cost_kes": 3717
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 3.54,
+              "leftover_quantity": 0,
+              "actual_quantity": 3.54,
+              "expected_quantity": 2.93,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1097.4,
+              "expected_cost_kes": 908.3
+            }
+          ]
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "date": "2026-04-24",
+      "student_count": 150,
+      "total_cost_kes": 7857.08,
+      "total_expected_cost_kes": 10192.5,
+      "cost_per_student_kes": 52.38,
+      "waste_estimate_kes": 424.65,
+      "meal_summaries": [
+        {
+          "meal_type": "BREAKFAST",
+          "cost_kes": 397.8,
+          "expected_cost_kes": 489.6,
+          "variance_kes": -91.8,
+          "waste_estimate_kes": 0,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 5.85,
+              "leftover_quantity": 0,
+              "actual_quantity": 5.85,
+              "expected_quantity": 7.2,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 397.8,
+              "expected_cost_kes": 489.6
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            }
+          ]
+        },
+        {
+          "meal_type": "LUNCH",
+          "cost_kes": 3467.98,
+          "expected_cost_kes": 4549.5,
+          "variance_kes": -1081.52,
+          "waste_estimate_kes": 228.15,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 19.01,
+              "leftover_quantity": 0,
+              "actual_quantity": 19.01,
+              "expected_quantity": 23.4,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1292.68,
+              "expected_cost_kes": 1591.2
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 12.43,
+              "leftover_quantity": 1.69,
+              "actual_quantity": 10.74,
+              "expected_quantity": 15.3,
+              "leftover_percentage": 13.6,
+              "actual_cost_kes": 1449.9,
+              "expected_cost_kes": 2065.5
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 2.34,
+              "leftover_quantity": 0,
+              "actual_quantity": 2.34,
+              "expected_quantity": 2.88,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 725.4,
+              "expected_cost_kes": 892.8
+            }
+          ]
+        },
+        {
+          "meal_type": "DINNER",
+          "cost_kes": 3991.3,
+          "expected_cost_kes": 5153.4,
+          "variance_kes": -1162.1,
+          "waste_estimate_kes": 196.5,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 8.78,
+              "leftover_quantity": 0,
+              "actual_quantity": 8.78,
+              "expected_quantity": 10.8,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1185.3,
+              "expected_cost_kes": 1458
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 16.09,
+              "leftover_quantity": 1.31,
+              "actual_quantity": 14.78,
+              "expected_quantity": 19.8,
+              "leftover_percentage": 8.14,
+              "actual_cost_kes": 2217,
+              "expected_cost_kes": 2970
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 1.9,
+              "leftover_quantity": 0,
+              "actual_quantity": 1.9,
+              "expected_quantity": 2.34,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 589,
+              "expected_cost_kes": 725.4
+            }
+          ]
+        }
+      ],
+      "alerts": [
+        {
+          "id": 8004,
+          "alert_type": "missing_leftover",
+          "severity": "MEDIUM",
+          "title": "No leftovers logged for breakfast",
+          "message": "No leftovers were logged for breakfast on 2026-04-24.",
+          "item_id": 101,
+          "meal_type": "BREAKFAST",
+          "status": "OPEN",
+          "source_record_type": "issue_logs",
+          "source_record_id": 3030,
+          "date_time": "2026-04-24T06:40:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "No leftovers were logged for breakfast on 2026-04-24.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        }
+      ]
+    },
+    {
+      "date": "2026-04-25",
+      "student_count": 159,
+      "total_cost_kes": 11081.93,
+      "total_expected_cost_kes": 11253.02,
+      "cost_per_student_kes": 69.7,
+      "waste_estimate_kes": 510.67,
+      "meal_summaries": [
+        {
+          "meal_type": "BREAKFAST",
+          "cost_kes": 496.4,
+          "expected_cost_kes": 540.6,
+          "variance_kes": -44.2,
+          "waste_estimate_kes": 60.52,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 8.19,
+              "leftover_quantity": 0.89,
+              "actual_quantity": 7.3,
+              "expected_quantity": 7.95,
+              "leftover_percentage": 10.87,
+              "actual_cost_kes": 496.4,
+              "expected_cost_kes": 540.6
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            }
+          ]
+        },
+        {
+          "meal_type": "LUNCH",
+          "cost_kes": 4933.63,
+          "expected_cost_kes": 5023.07,
+          "variance_kes": -89.44,
+          "waste_estimate_kes": 241.65,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 26.61,
+              "leftover_quantity": 0,
+              "actual_quantity": 26.61,
+              "expected_quantity": 25.84,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1809.48,
+              "expected_cost_kes": 1757.12
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 17.4,
+              "leftover_quantity": 1.79,
+              "actual_quantity": 15.61,
+              "expected_quantity": 16.89,
+              "leftover_percentage": 10.29,
+              "actual_cost_kes": 2107.35,
+              "expected_cost_kes": 2280.15
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 3.28,
+              "leftover_quantity": 0,
+              "actual_quantity": 3.28,
+              "expected_quantity": 3.18,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1016.8,
+              "expected_cost_kes": 985.8
+            }
+          ]
+        },
+        {
+          "meal_type": "DINNER",
+          "cost_kes": 5651.9,
+          "expected_cost_kes": 5689.35,
+          "variance_kes": -37.45,
+          "waste_estimate_kes": 208.5,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 12.28,
+              "leftover_quantity": 0,
+              "actual_quantity": 12.28,
+              "expected_quantity": 11.93,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1657.8,
+              "expected_cost_kes": 1610.55
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 22.52,
+              "leftover_quantity": 1.39,
+              "actual_quantity": 21.13,
+              "expected_quantity": 21.86,
+              "leftover_percentage": 6.17,
+              "actual_cost_kes": 3169.5,
+              "expected_cost_kes": 3279
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 2.66,
+              "leftover_quantity": 0,
+              "actual_quantity": 2.66,
+              "expected_quantity": 2.58,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 824.6,
+              "expected_cost_kes": 799.8
+            }
+          ]
+        }
+      ],
+      "alerts": [
+        {
+          "id": 8001,
+          "alert_type": "stock_mismatch",
+          "severity": "HIGH",
+          "title": "Cooking oil variance detected",
+          "message": "Counted 31 against system 36.5 for Cooking oil.",
+          "item_id": 104,
+          "meal_type": null,
+          "status": "OPEN",
+          "source_record_type": "stock_counts",
+          "source_record_id": 5003,
+          "date_time": "2026-04-25T18:40:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "Counted 31 against system 36.5 for Cooking oil.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        },
+        {
+          "id": 8002,
+          "alert_type": "stock_mismatch",
+          "severity": "HIGH",
+          "title": "Beans variance detected",
+          "message": "Counted 118 against system 136 for Beans.",
+          "item_id": 102,
+          "meal_type": null,
+          "status": "OPEN",
+          "source_record_type": "stock_counts",
+          "source_record_id": 5002,
+          "date_time": "2026-04-25T18:35:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "Counted 118 against system 136 for Beans.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        }
+      ]
+    },
+    {
+      "date": "2026-04-26",
+      "student_count": 161,
+      "total_cost_kes": 11447.53,
+      "total_expected_cost_kes": 11509.1,
+      "cost_per_student_kes": 71.1,
+      "waste_estimate_kes": 517.73,
+      "meal_summaries": [
+        {
+          "meal_type": "BREAKFAST",
+          "cost_kes": 512.72,
+          "expected_cost_kes": 552.84,
+          "variance_kes": -40.12,
+          "waste_estimate_kes": 61.88,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 8.45,
+              "leftover_quantity": 0.91,
+              "actual_quantity": 7.54,
+              "expected_quantity": 8.13,
+              "leftover_percentage": 10.77,
+              "actual_cost_kes": 512.72,
+              "expected_cost_kes": 552.84
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            }
+          ]
+        },
+        {
+          "meal_type": "LUNCH",
+          "cost_kes": 5096.01,
+          "expected_cost_kes": 5136.86,
+          "variance_kes": -40.85,
+          "waste_estimate_kes": 244.35,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 27.47,
+              "leftover_quantity": 0,
+              "actual_quantity": 27.47,
+              "expected_quantity": 26.42,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1867.96,
+              "expected_cost_kes": 1796.56
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 17.96,
+              "leftover_quantity": 1.81,
+              "actual_quantity": 16.15,
+              "expected_quantity": 17.28,
+              "leftover_percentage": 10.08,
+              "actual_cost_kes": 2180.25,
+              "expected_cost_kes": 2332.8
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 3.38,
+              "leftover_quantity": 0,
+              "actual_quantity": 3.38,
+              "expected_quantity": 3.25,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1047.8,
+              "expected_cost_kes": 1007.5
+            }
+          ]
+        },
+        {
+          "meal_type": "DINNER",
+          "cost_kes": 5838.8,
+          "expected_cost_kes": 5819.4,
+          "variance_kes": 19.4,
+          "waste_estimate_kes": 211.5,
+          "items": [
+            {
+              "item_id": 101,
+              "item_name": "Maize flour",
+              "unit": "kg",
+              "issued_quantity": 0,
+              "leftover_quantity": 0,
+              "actual_quantity": 0,
+              "expected_quantity": 0,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 0,
+              "expected_cost_kes": 0
+            },
+            {
+              "item_id": 102,
+              "item_name": "Beans",
+              "unit": "kg",
+              "issued_quantity": 12.68,
+              "leftover_quantity": 0,
+              "actual_quantity": 12.68,
+              "expected_quantity": 12.2,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 1711.8,
+              "expected_cost_kes": 1647
+            },
+            {
+              "item_id": 103,
+              "item_name": "Rice",
+              "unit": "kg",
+              "issued_quantity": 23.24,
+              "leftover_quantity": 1.41,
+              "actual_quantity": 21.83,
+              "expected_quantity": 22.36,
+              "leftover_percentage": 6.07,
+              "actual_cost_kes": 3274.5,
+              "expected_cost_kes": 3354
+            },
+            {
+              "item_id": 104,
+              "item_name": "Cooking oil",
+              "unit": "litres",
+              "issued_quantity": 2.75,
+              "leftover_quantity": 0,
+              "actual_quantity": 2.75,
+              "expected_quantity": 2.64,
+              "leftover_percentage": 0,
+              "actual_cost_kes": 852.5,
+              "expected_cost_kes": 818.4
+            }
+          ]
+        }
+      ],
+      "alerts": []
+    }
+  ],
+  "simulated_dashboard_output": {
+    "date": "2026-04-26",
+    "todays_cost_label": "Today's Cost: KES 11447.53",
+    "cost_per_student_label": "Cost per Student: KES 71.1",
+    "alerts": [
+      "Cooking oil variance detected",
+      "Beans variance detected",
+      "Beans issued twice"
+    ]
+  }
+}
