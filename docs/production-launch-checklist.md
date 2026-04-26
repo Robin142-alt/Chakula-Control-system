@@ -3,6 +3,7 @@
 ## Before first deploy
 
 - Confirm `DATABASE_URL` is set
+- Confirm `SESSION_SECRET` is set to a private value
 - Confirm `APP_DATA_MODE=database` in production
 - Run `npm ci`
 - Run `npm test`
@@ -21,11 +22,13 @@
 
 - Set `PORT` from platform defaults
 - Set `VITE_API_BASE_URL` to your public API URL if frontend and API are split
-- Keep the health check on `/api/health`
+- Set `ALLOWED_ORIGINS` when frontend and API are split
+- Keep the health check on `/api/readiness`
 - Watch first-start logs for:
   - app mode
   - port binding
   - Neon connection failures
+  - default session secret warning
   - readiness failures due to missing `DATABASE_URL`
 
 ## Manual acceptance checks
@@ -35,6 +38,8 @@
 - Offline indicator changes correctly
 - Storekeeper can save an issue locally
 - Cook can save a leftover locally
+- Storekeeper can import late paper rows from CSV
+- Shared-device PIN login works online, then offline on the same device
 - Principal view shows:
   - today's cost
   - cost per student

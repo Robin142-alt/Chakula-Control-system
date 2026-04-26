@@ -1,8 +1,8 @@
 export const MEAL_ORDER = ["BREAKFAST", "LUNCH", "DINNER"];
 
 export const ROLE_ACCESS = {
-  STOREKEEPER: ["dashboard", "issue-stock", "inventory", "stock-count", "reports"],
-  COOK: ["dashboard", "log-leftovers", "inventory", "reports"],
+  STOREKEEPER: ["dashboard", "issue-stock", "inventory", "stock-count", "backfill-import", "reports"],
+  COOK: ["dashboard", "log-leftovers", "inventory", "backfill-import", "reports"],
   ACCOUNTANT: ["dashboard", "inventory", "reports"],
   PRINCIPAL: ["dashboard"],
   ADMIN: ["dashboard", "inventory", "reports"],
@@ -14,6 +14,9 @@ export const USERS = [
     full_name: "Grace Wanjiku",
     role: "STOREKEEPER",
     display_name: "Grace - Storekeeper",
+    pin_label: "Kitchen PIN",
+    is_active: true,
+    must_rotate_pin: false,
     created_by: 5,
   },
   {
@@ -21,6 +24,9 @@ export const USERS = [
     full_name: "Peter Otieno",
     role: "COOK",
     display_name: "Peter - Cook",
+    pin_label: "Kitchen PIN",
+    is_active: true,
+    must_rotate_pin: false,
     created_by: 5,
   },
   {
@@ -28,6 +34,9 @@ export const USERS = [
     full_name: "Mary Njeri",
     role: "ACCOUNTANT",
     display_name: "Mary - Accountant",
+    pin_label: "Office PIN",
+    is_active: true,
+    must_rotate_pin: false,
     created_by: 5,
   },
   {
@@ -35,6 +44,9 @@ export const USERS = [
     full_name: "Mr. Kibet",
     role: "PRINCIPAL",
     display_name: "Mr. Kibet - Principal",
+    pin_label: "Office PIN",
+    is_active: true,
+    must_rotate_pin: false,
     created_by: 5,
   },
   {
@@ -42,6 +54,9 @@ export const USERS = [
     full_name: "Admin Achieng",
     role: "ADMIN",
     display_name: "Admin Achieng",
+    pin_label: "Admin PIN",
+    is_active: true,
+    must_rotate_pin: false,
     created_by: 5,
   },
 ];
@@ -406,4 +421,3 @@ export const DEMO_DATA = {
   leftover_logs: LEFTOVER_LOGS,
   stock_counts: STOCK_COUNTS,
 };
-

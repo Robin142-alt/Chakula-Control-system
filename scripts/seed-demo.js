@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { buildInventorySnapshot } from "../data/derivedData.js";
 import { pool } from "../server/db.js";
 import { DEMO_DATA } from "../data/demoData.js";
+import { DEMO_AUTH_USERS } from "../server/demoUsers.js";
 import {
   buildCostTrackingRows,
   buildDailySummaries,
@@ -245,8 +246,12 @@ try {
   });
   const activityRows = buildActivityLogs(alertRows);
 
-  await insertMany(client, "users", DEMO_DATA.users);
-  await insertMany(client, "inventory_items", inventorySnapshot);
+  await insertMany(client, "users", DEMO_AUTH_USERS);
+  await insertMany(
+    client,
+    "inventory_items",
+    inventorySnapshot.map(({ status, ...row }) => row),
+  );
   await insertMany(client, "student_counts", DEMO_DATA.student_counts);
   await insertMany(client, "expected_usage", DEMO_DATA.expected_usage);
   await insertMany(client, "issue_logs", DEMO_DATA.issue_logs);

@@ -10,8 +10,8 @@ import {
   normalizeRole,
   roundValue,
   safeNumber,
-  sortAlerts,
 } from "../../data/logic.js";
+import { hashPinBrowser } from "./authClient.js";
 
 const DB_NAME = "chakula-control-local";
 const DB_VERSION = 1;
@@ -28,26 +28,65 @@ const STORE_NAMES = [
 ];
 
 function getApiBaseUrl() {
-  return (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "");
+  const configuredBaseUrl = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "");
+
+  if (typeof window === "undefined" || !/^https?:\/\//i.test(configuredBaseUrl)) {
+    return configuredBaseUrl;
+  }
+
+  try {
+    const configuredUrl = new URL(configuredBaseUrl);
+    const currentUrl = new URL(window.location.origin);
+    const configuredIsLocal = ["localhost", "127.0.0.1"].includes(configuredUrl.hostname);
+    const currentIsLocal = ["localhost", "127.0.0.1"].includes(currentUrl.hostname);
+
+    if (configuredIsLocal && currentIsLocal && configuredUrl.port !== currentUrl.port) {
+      return `${window.location.origin}/api`;
+    }
+  } catch {
+    return configuredBaseUrl;
+  }
+
+  return configuredBaseUrl;
 }
 
 function sortByDateTime(records) {
   return [...records].sort((left, right) => String(left.date_time).localeCompare(String(right.date_time)));
 }
 
-function createLocalWarnings(record) {
-  const warnings = [];
+function createLocalId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `local-${crypto.randomUUID()}`;
+  }
 
-  if (!record.item_id && !record.raw_input_text) {
+  return `local-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+}
+
+function createLocalWarnings(record, storeName) {
+  const warnings = [];
+  const isStudentCount = storeName === "student_counts";
+
+  if (!isStudentCount && !record.item_id && !record.raw_input_text) {
     warnings.push("Item missing. Saved for later review.");
   }
-  if (record.quantity === null || record.quantity === undefined || record.quantity === "") {
-    warnings.push("Quantity missing. Saved with 0 for calculations.");
+  if (
+    isStudentCount
+      ? record.student_count === null || record.student_count === undefined || record.student_count === ""
+      : record.quantity === null || record.quantity === undefined || record.quantity === ""
+  ) {
+    warnings.push(
+      isStudentCount
+        ? "Student count missing. Saved with 0 for calculations."
+        : "Quantity missing. Saved with 0 for calculations.",
+    );
   }
   if (!record.meal_type) {
     warnings.push("Meal type missing. Saved anyway.");
   }
-  if (safeNumber(record.quantity) > 80) {
+  if (isStudentCount && safeNumber(record.student_count) > 3000) {
+    warnings.push("Student count looks unusually high. Review when convenient.");
+  }
+  if (!isStudentCount && safeNumber(record.quantity) > 80) {
     warnings.push("Large quantity recorded. Review when convenient.");
   }
 
@@ -82,6 +121,7 @@ export async function seedKitchenDb() {
   await tx.objectStore("meta").put({ id: "seeded", value: true });
   await tx.objectStore("meta").put({ id: "last_sync_at", value: null });
   await tx.objectStore("meta").put({ id: "active_user_id", value: 1 });
+  await tx.objectStore("meta").put({ id: "current_session", value: null });
 
   for (const user of USERS) {
     await tx.objectStore("meta").put({ id: `user:${user.id}`, value: user });
@@ -120,16 +160,191 @@ export async function seedKitchenDb() {
   await tx.done;
 }
 
-export async function getActiveUser() {
-  const db = await openKitchenDb();
-  const stored = await db.get("meta", "active_user_id");
-  const userId = stored?.value || 1;
-  return USERS.find((user) => user.id === userId) || USERS[0];
+async function getUsersFromMeta(db) {
+  const metaRows = await db.getAll("meta");
+  return metaRows
+    .filter((row) => String(row.id).startsWith("user:"))
+    .map((row) => row.value)
+    .sort((left, right) => Number(left.id) - Number(right.id));
 }
 
-export async function setActiveUser(userId) {
+async function getStoredUserById(db, userId) {
+  const row = await db.get("meta", `user:${Number(userId)}`);
+  return row?.value || null;
+}
+
+async function upsertStoredUser(db, user) {
+  await db.put("meta", {
+    id: `user:${Number(user.id)}`,
+    value: user,
+  });
+}
+
+function toPublicUser(user) {
+  if (!user) {
+    return null;
+  }
+
+  const { pin_hash, ...publicUser } = user;
+  return publicUser;
+}
+
+export async function getStoredUsers() {
+  await seedKitchenDb();
   const db = await openKitchenDb();
-  await db.put("meta", { id: "active_user_id", value: Number(userId) });
+  return getUsersFromMeta(db);
+}
+
+export async function syncUsersFromApi() {
+  await seedKitchenDb();
+  if (!navigator.onLine) {
+    return getStoredUsers();
+  }
+
+  const db = await openKitchenDb();
+  const localUsers = await getUsersFromMeta(db);
+  const localById = new Map(localUsers.map((user) => [Number(user.id), user]));
+
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/auth/users`);
+    if (!response.ok) {
+      return localUsers;
+    }
+
+    const body = await response.json();
+    const tx = db.transaction("meta", "readwrite");
+    for (const user of body.users || []) {
+      const existing = localById.get(Number(user.id)) || {};
+      await tx.objectStore("meta").put({
+        id: `user:${Number(user.id)}`,
+        value: {
+          ...existing,
+          ...user,
+          pin_hash: existing.pin_hash || null,
+        },
+      });
+    }
+    await tx.done;
+    return getUsersFromMeta(db);
+  } catch {
+    return localUsers;
+  }
+}
+
+export async function getCurrentSession() {
+  await seedKitchenDb();
+  const db = await openKitchenDb();
+  const stored = await db.get("meta", "current_session");
+  return stored?.value || null;
+}
+
+async function persistSession(session) {
+  const db = await openKitchenDb();
+  const tx = db.transaction("meta", "readwrite");
+  await tx.objectStore("meta").put({ id: "current_session", value: session });
+  await tx.objectStore("meta").put({ id: "active_user_id", value: Number(session.user.id) });
+
+  const existingUser = await tx.objectStore("meta").get(`user:${Number(session.user.id)}`);
+  await tx.objectStore("meta").put({
+    id: `user:${Number(session.user.id)}`,
+    value: {
+      ...(existingUser?.value || {}),
+      ...session.user,
+      pin_hash: session.pin_hash || existingUser?.value?.pin_hash || null,
+      last_login_at: session.authenticated_at,
+    },
+  });
+  await tx.done;
+}
+
+export async function clearCurrentSession() {
+  const db = await openKitchenDb();
+  await db.put("meta", { id: "current_session", value: null });
+}
+
+export async function loginWithPin({ userId, pin }) {
+  await seedKitchenDb();
+  const db = await openKitchenDb();
+  const normalizedPin = String(pin || "").trim();
+  const pinHash = await hashPinBrowser(normalizedPin);
+  const localUser = await getStoredUserById(db, userId);
+  const localMatch = Boolean(localUser?.pin_hash && localUser.pin_hash === pinHash);
+
+  if (navigator.onLine) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: Number(userId),
+          pin: normalizedPin,
+        }),
+      });
+      const body = await response.json();
+
+      if (response.ok && body.success) {
+        const session = {
+          ...body.session,
+          pin_hash: pinHash,
+          authenticated_at: new Date().toISOString(),
+        };
+        await persistSession(session);
+        return {
+          success: true,
+          warnings: body.warnings || [],
+          session,
+        };
+      }
+
+      if (!localMatch) {
+        return {
+          success: false,
+          warnings: body.warnings || [{ message: "User or PIN did not match." }],
+        };
+      }
+    } catch {
+      // fall through to offline proof login
+    }
+  }
+
+  if (!localMatch) {
+    return {
+      success: false,
+      warnings: [{ message: "This device cannot verify that PIN offline yet. Connect once and try again." }],
+    };
+  }
+
+  const session = {
+    user: toPublicUser(localUser),
+    token: null,
+    expires_at: null,
+    auth_mode: "offline-proof",
+    pin_hash: pinHash,
+    authenticated_at: new Date().toISOString(),
+  };
+  await persistSession(session);
+
+  return {
+    success: true,
+    warnings: [{ message: "Signed in with offline proof. Sync will use stored proof until a live token is refreshed." }],
+    session,
+  };
+}
+
+function buildAuthContext(session) {
+  if (!session?.user?.id) {
+    return null;
+  }
+
+  return {
+    user_id: Number(session.user.id),
+    role: normalizeRole(session.user.role),
+    token: session.token || null,
+    pin_proof: session.pin_hash || null,
+    auth_mode: session.auth_mode || "offline-proof",
+  };
 }
 
 export async function loadAppSnapshot() {
@@ -191,9 +406,9 @@ export async function loadAppSnapshot() {
   };
 }
 
-export async function saveEntryLocally(storeName, endpoint, payload) {
-  const db = await openKitchenDb();
+async function savePreparedEntryLocally(db, { storeName, endpoint, payload, authContext }) {
   const now = new Date().toISOString();
+  const localId = payload.id || createLocalId();
   const numericQuantity =
     payload.quantity === undefined
       ? payload.counted_quantity === undefined
@@ -201,9 +416,11 @@ export async function saveEntryLocally(storeName, endpoint, payload) {
         : safeNumber(payload.counted_quantity)
       : safeNumber(payload.quantity);
   const record = {
-    id: payload.id || Date.now(),
+    id: localId,
     item_id: payload.item_id ?? null,
     quantity: payload.quantity === undefined ? numericQuantity : numericQuantity,
+    student_count: payload.student_count ?? null,
+    count_date: payload.count_date ?? null,
     counted_quantity: payload.counted_quantity ?? null,
     system_quantity: payload.system_quantity ?? null,
     variance_quantity:
@@ -244,20 +461,62 @@ export async function saveEntryLocally(storeName, endpoint, payload) {
     endpoint,
     store_name: storeName,
     payload: record,
+    auth_context: authContext,
     conflict_flag: record.conflict_flag,
     attempts: 0,
   });
   await store.done;
 
   return {
-    warnings: createLocalWarnings(record),
+    warnings: createLocalWarnings(record, storeName),
     record,
   };
+}
+
+export async function saveEntryLocally(storeName, endpoint, payload, session) {
+  if (!session?.user?.id) {
+    throw new Error("A signed-in user is required before saving.");
+  }
+
+  const db = await openKitchenDb();
+  return savePreparedEntryLocally(db, {
+    storeName,
+    endpoint,
+    payload: {
+      ...payload,
+      created_by: payload.created_by ?? session.user.id,
+    },
+    authContext: buildAuthContext(session),
+  });
+}
+
+export async function saveEntriesLocally(entries, session) {
+  if (!session?.user?.id) {
+    throw new Error("A signed-in user is required before importing.");
+  }
+
+  const results = [];
+  const db = await openKitchenDb();
+  for (const entry of entries) {
+    const result = await savePreparedEntryLocally(db, {
+      storeName: entry.storeName,
+      endpoint: entry.endpoint,
+      payload: {
+        ...entry.payload,
+        created_by: entry.payload.created_by ?? session.user.id,
+      },
+      authContext: buildAuthContext(session),
+    });
+    results.push(result);
+  }
+
+  return results;
 }
 
 export async function flushSyncQueue() {
   const db = await openKitchenDb();
   const queueItems = await db.getAll("sync_queue");
+  const currentSession = await getCurrentSession();
 
   if (!navigator.onLine || !queueItems.length) {
     return { synced_count: 0, warnings: [] };
@@ -268,19 +527,37 @@ export async function flushSyncQueue() {
 
   for (const queueItem of queueItems.sort((left, right) => String(left.created_at).localeCompare(String(right.created_at)))) {
     try {
+      const authContext = queueItem.auth_context || buildAuthContext(currentSession);
+      const authHeaders = authContext?.token
+        ? {
+            Authorization: `Bearer ${authContext.token}`,
+          }
+        : {};
       const response = await fetch(`${getApiBaseUrl()}${queueItem.endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...authHeaders,
         },
         body: JSON.stringify({
           ...queueItem.payload,
-          actor_role: normalizeRole(USERS.find((user) => user.id === queueItem.payload.created_by)?.role),
+          auth_context: authContext,
           conflict_flag: queueItem.conflict_flag,
         }),
       });
       const result = await response.json();
       warnings.push(...(result.warnings || []).map((warning) => warning.message || warning));
+      if (!response.ok || (result.saved === false && result.retry_later)) {
+        const tx = db.transaction("sync_queue", "readwrite");
+        await tx.objectStore("sync_queue").put({
+          ...queueItem,
+          attempts: safeNumber(queueItem.attempts) + 1,
+          last_error: result.warnings?.[0]?.message || `HTTP ${response.status}`,
+        });
+        await tx.done;
+        continue;
+      }
+
       const tx = db.transaction([queueItem.store_name, "sync_queue", "meta"], "readwrite");
       const latestRecord = await tx.objectStore(queueItem.store_name).get(queueItem.payload.id);
       if (latestRecord) {

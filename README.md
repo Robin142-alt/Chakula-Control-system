@@ -8,7 +8,9 @@ Offline-first Smart Kitchen Accountability System built for low-resource boardin
 - Express API connected to PostgreSQL on Neon through `DATABASE_URL`
 - Background sync queue with local-first save behavior
 - Tolerant data capture that never blocks input and returns warnings instead of validation errors
+- Shared-device PIN login with online tokens and offline proof after one trusted sign-in
 - Role-shaped dashboards for Storekeeper, Cook, Accountant, Principal, and Admin
+- CSV backfill import for paper records and late entry cleanup
 - Seven-day Kenyan demo dataset with realistic items, KES pricing, anomalies, and cost outputs
 
 ## Quick start
@@ -48,6 +50,18 @@ npm run dev:web
 ```bash
 npm run build
 ```
+
+## Demo sign-in
+
+The system uses a shared-device PIN login for the demo:
+
+- Grace - Storekeeper: `2048`
+- Peter - Cook: `1122`
+- Mary - Accountant: `3344`
+- Mr. Kibet - Principal: `4455`
+- Admin Achieng: `7788`
+
+These credentials are demo-only and should be replaced before any real deployment.
 
 ## Testing
 
@@ -96,12 +110,18 @@ Use `.env.example` as the template. The real local `.env` uses:
 - `DATABASE_URL`
 - `PORT`
 - `VITE_API_BASE_URL`
+- `SESSION_SECRET`
+- `SESSION_TTL_HOURS`
+- `ALLOWED_ORIGINS`
+- `APP_DATA_MODE`
 
 Credentials are not hardcoded in source files.
 
 For an API and UI walkthrough without a live database, you can also run with:
 
 - `APP_DATA_MODE=demo`
+
+In `APP_DATA_MODE=demo`, authenticated writes are preserved in the local queue and server fallback log instead of writing into Neon.
 
 ## Core files
 
@@ -114,6 +134,7 @@ For an API and UI walkthrough without a live database, you can also run with:
 - Frontend app shell: [src/App.jsx](src/App.jsx)
 - Simulated output: [docs/simulated-dashboard-output.json](docs/simulated-dashboard-output.json)
 - Deployment notes: [docs/deployment.md](docs/deployment.md)
+- Demo credentials: [docs/demo-credentials.md](docs/demo-credentials.md)
 - Production checklist: [docs/production-launch-checklist.md](docs/production-launch-checklist.md)
 - Demo flow: [docs/demo-flow.md](docs/demo-flow.md)
 - Pitch script: [docs/pitch-script.md](docs/pitch-script.md)
@@ -124,10 +145,15 @@ For an API and UI walkthrough without a live database, you can also run with:
 - `POST /api/issue-stock`
 - `POST /api/log-leftover`
 - `POST /api/stock-count`
+- `POST /api/student-count`
+- `POST /api/auth/login`
 - `GET /api/dashboard-summary`
 - `GET /api/alerts`
 - `GET /api/reports`
 - `GET /api/health`
+- `GET /api/readiness`
+- `GET /api/auth/users`
+- `GET /api/auth/session`
 
 All write endpoints return:
 

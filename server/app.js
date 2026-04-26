@@ -19,14 +19,33 @@ import {
   sortAlerts,
   toDateKey,
 } from "../data/logic.js";
+import { authenticateRequest, buildSessionResponse, verifyPinHash, verifySessionToken } from "./auth.js";
 import { queryDb, withTransaction } from "./db.js";
 import { getRuntimeStatus } from "./runtime.js";
+import { getUserById, listUsers, markUserLogin, sanitizeUser } from "./users.js";
 
 const app = express();
 const fallbackPath = resolve(process.cwd(), "data", "server-ingest-fallback.jsonl");
 const dataMode = process.env.APP_DATA_MODE === "demo" ? "demo" : "database";
+const allowedOrigins = String(process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(cors());
+function corsOriginResolver(origin, callback) {
+  if (!origin || !allowedOrigins.length || allowedOrigins.includes("*")) {
+    callback(null, true);
+    return;
+  }
+
+  callback(null, allowedOrigins.includes(origin));
+}
+
+app.use(cors({
+  origin: corsOriginResolver,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use(express.json({ limit: "2mb" }));
 
 function asyncHandler(handler) {
@@ -46,6 +65,9 @@ function addWarning(warnings, code, message, severity = "medium") {
 function isInputRoleAllowed(endpoint, actorRole) {
   const role = normalizeRole(actorRole);
   if (endpoint === "issue-stock" || endpoint === "stock-count") {
+    return role === "STOREKEEPER";
+  }
+  if (endpoint === "student-count") {
     return role === "STOREKEEPER";
   }
   if (endpoint === "log-leftover") {
@@ -88,6 +110,25 @@ function buildCommonWarnings(payload) {
   }
   if (safeNumber(payload.quantity) > 80) {
     addWarning(warnings, "suspicious_quantity", "Quantity is higher than usual for one meal.");
+  }
+
+  return warnings;
+}
+
+function buildStudentCountWarnings(payload) {
+  const warnings = defaultWarnings();
+
+  if (payload.student_count === null || payload.student_count === undefined || payload.student_count === "") {
+    addWarning(warnings, "missing_student_count", "Student count was missing, so it was saved with 0 for calculations.");
+  }
+  if (!payload.date_time) {
+    addWarning(warnings, "missing_date_time", "Timestamp was missing, so the server used the current time.");
+  }
+  if (safeNumber(payload.student_count) < 1) {
+    addWarning(warnings, "low_student_count", "Student count looks very low and should be reviewed.");
+  }
+  if (safeNumber(payload.student_count) > 3000) {
+    addWarning(warnings, "high_student_count", "Student count looks unusually high and should be reviewed.");
   }
 
   return warnings;
@@ -271,6 +312,11 @@ async function maybeSaveDirectAlert(client, alert) {
 }
 
 async function handleReadOnlyAttempt(endpoint, payload, warnings) {
+  if (dataMode !== "database") {
+    await appendFallback(`${endpoint}-role-attempt`, payload, warnings, "Read-only role attempted data entry in demo mode");
+    return;
+  }
+
   await withTransaction(async (client) => {
     await insertActivityLog(client, {
       actor_user_id: payload.created_by ?? payload.actor_user_id ?? null,
@@ -300,6 +346,165 @@ async function safelyHandleReadOnlyAttempt(endpoint, payload, warnings) {
   }
 }
 
+async function saveDemoModeWrite(endpoint, payload, warnings, actor) {
+  addWarning(
+    warnings,
+    "demo_mode_storage",
+    "Demo mode preserved this entry in the fallback log instead of writing to Neon.",
+    "low",
+  );
+  await appendFallback(`${endpoint}-demo`, {
+    ...payload,
+    created_by: actor?.id ?? payload.created_by ?? null,
+    actor_role: actor?.role ?? null,
+    saved_in_demo_mode: true,
+  }, warnings, "Demo mode write");
+}
+
+async function resolveAuthorizedInput(req, endpoint, payload, warnings) {
+  const auth = await authenticateRequest(req, dataMode);
+
+  if (!auth.ok || !auth.user) {
+    addWarning(warnings, "auth_required", "Session could not be verified yet. The payload was preserved for retry.");
+    await appendFallback(`${endpoint}-auth-pending`, { ...payload, auth_context: req.body?.auth_context }, warnings, "Auth required");
+    return {
+      allowed: false,
+      retry_later: true,
+      stored: true,
+      storage_mode: "fallback_queue",
+      actor: null,
+      auth_method: null,
+    };
+  }
+
+  if (!isInputRoleAllowed(endpoint, auth.user.role)) {
+    addWarning(warnings, "role_warning", "This signed-in role is read-only for this input type. The attempt was saved in the audit trail.");
+    await safelyHandleReadOnlyAttempt(endpoint, {
+      ...payload,
+      created_by: auth.user.id,
+      actor_role: auth.user.role,
+      auth_method: auth.method,
+    }, warnings);
+    return {
+      allowed: false,
+      retry_later: false,
+      stored: true,
+      storage_mode: dataMode === "database" ? "audit_only" : "fallback_queue",
+      actor: auth.user,
+      auth_method: auth.method,
+    };
+  }
+
+  if (payload.created_by && Number(payload.created_by) !== Number(auth.user.id)) {
+    addWarning(warnings, "actor_mismatch", "Session user and payload user differed, so the signed-in user was used.");
+  }
+
+  return {
+    allowed: true,
+    retry_later: false,
+    stored: true,
+    storage_mode: "primary",
+    actor: auth.user,
+    auth_method: auth.method,
+  };
+}
+
+app.get("/api/auth/users", asyncHandler(async (_req, res) => {
+  const users = await listUsers(dataMode);
+  return res.json({
+    success: true,
+    warnings: [],
+    users: users.map(sanitizeUser),
+  });
+}));
+
+app.post("/api/auth/login", asyncHandler(async (req, res) => {
+  const warnings = defaultWarnings();
+  const userId = req.body.user_id ?? req.body.userId ?? null;
+  const pin = String(req.body.pin || "").trim();
+
+  if (!userId) {
+    addWarning(warnings, "missing_user", "Please choose a user account.");
+  }
+  if (!pin) {
+    addWarning(warnings, "missing_pin", "Please enter the account PIN.");
+  }
+  if (warnings.length) {
+    return res.status(400).json({ success: false, warnings });
+  }
+
+  const user = await getUserById(userId, dataMode);
+  if (!user || user.is_active === false || !verifyPinHash(pin, user.pin_hash)) {
+    return res.status(401).json({
+      success: false,
+      warnings: [
+        {
+          code: "invalid_credentials",
+          message: "User or PIN did not match.",
+          severity: "high",
+        },
+      ],
+    });
+  }
+
+  await markUserLogin(user.id, dataMode);
+
+  return res.json({
+    success: true,
+    warnings: user.must_rotate_pin
+      ? [{
+          code: "rotate_pin",
+          message: "This account is marked for a PIN change.",
+          severity: "medium",
+        }]
+      : [],
+    session: buildSessionResponse(user),
+  });
+}));
+
+app.get("/api/auth/session", asyncHandler(async (req, res) => {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const payload = verifySessionToken(token);
+
+  if (!payload?.sub) {
+    return res.status(401).json({
+      success: false,
+      warnings: [
+        {
+          code: "session_invalid",
+          message: "Session is missing or expired.",
+          severity: "high",
+        },
+      ],
+    });
+  }
+
+  const user = await getUserById(payload.sub, dataMode);
+  if (!user || user.is_active === false) {
+    return res.status(401).json({
+      success: false,
+      warnings: [
+        {
+          code: "session_invalid",
+          message: "Session user is no longer active.",
+          severity: "high",
+        },
+      ],
+    });
+  }
+
+  return res.json({
+    success: true,
+    warnings: [],
+    session: {
+      user: sanitizeUser(user),
+      expires_at: payload.exp,
+      auth_mode: "online-token",
+    },
+  });
+}));
+
 app.post("/api/issue-stock", async (req, res) => {
   const payload = {
     item_id: req.body.item_id ?? null,
@@ -312,13 +517,30 @@ app.post("/api/issue-stock", async (req, res) => {
     entered_late: Boolean(req.body.entered_late),
     conflict_flag: Boolean(req.body.conflict_flag),
   };
-  const actorRole = inferUserRole(payload.created_by, req.body.actor_role);
   const warnings = buildCommonWarnings(payload);
+  const authState = await resolveAuthorizedInput(req, "issue-stock", payload, warnings);
 
-  if (!isInputRoleAllowed("issue-stock", actorRole)) {
-    addWarning(warnings, "role_warning", "Only the storekeeper can issue stock. The attempt was saved in the audit trail.");
-    await safelyHandleReadOnlyAttempt("issue-stock", { ...payload, actor_role: actorRole }, warnings);
-    return res.json({ success: true, warnings });
+  if (!authState.allowed) {
+    return res.json({
+      success: true,
+      warnings,
+      saved: false,
+      stored: authState.stored,
+      storage_mode: authState.storage_mode,
+      retry_later: authState.retry_later,
+    });
+  }
+
+  if (dataMode !== "database") {
+    await saveDemoModeWrite("issue-stock", payload, warnings, authState.actor);
+    return res.json({
+      success: true,
+      warnings,
+      saved: true,
+      stored: true,
+      deferred: true,
+      storage_mode: "demo_fallback",
+    });
   }
 
   try {
@@ -346,7 +568,7 @@ app.post("/api/issue-stock", async (req, res) => {
           payload.date_time,
           req.body.expected_students ?? null,
           payload.notes,
-          payload.created_by,
+          authState.actor.id,
           payload.entered_late,
           payload.conflict_flag,
         ],
@@ -371,7 +593,7 @@ app.post("/api/issue-stock", async (req, res) => {
           payload.date_time,
           payload.raw_input_text,
           payload.notes,
-          payload.created_by,
+          authState.actor.id,
           payload.entered_late,
           payload.conflict_flag,
         ],
@@ -410,8 +632,8 @@ app.post("/api/issue-stock", async (req, res) => {
 
       await rebuildCostTrackingForDate(client, toDateKey(payload.date_time));
       await insertActivityLog(client, {
-        actor_user_id: payload.created_by,
-        actor_role: actorRole,
+        actor_user_id: authState.actor.id,
+        actor_role: authState.actor.role,
         action_type: "ISSUE_STOCK",
         target_table: "issue_logs",
         target_id: saved.id,
@@ -420,18 +642,18 @@ app.post("/api/issue-stock", async (req, res) => {
         warnings,
         raw_input_text: payload.raw_input_text,
         notes: payload.notes,
-        created_by: payload.created_by,
+        created_by: authState.actor.id,
         entered_late: payload.entered_late,
         conflict_flag: payload.conflict_flag,
         date_time: payload.date_time,
       });
     });
 
-    return res.json({ success: true, warnings });
+    return res.json({ success: true, warnings, saved: true });
   } catch (error) {
     addWarning(warnings, "server_storage_deferred", "Database save failed, so the payload was written to the server fallback queue.");
     await appendFallback("issue-stock", req.body, warnings, error.message);
-    return res.json({ success: true, warnings });
+    return res.json({ success: true, warnings, saved: true, deferred: true });
   }
 });
 
@@ -447,13 +669,30 @@ app.post("/api/log-leftover", async (req, res) => {
     entered_late: Boolean(req.body.entered_late),
     conflict_flag: Boolean(req.body.conflict_flag),
   };
-  const actorRole = inferUserRole(payload.created_by, req.body.actor_role);
   const warnings = buildCommonWarnings(payload);
+  const authState = await resolveAuthorizedInput(req, "log-leftover", payload, warnings);
 
-  if (!isInputRoleAllowed("log-leftover", actorRole)) {
-    addWarning(warnings, "role_warning", "Only the cook can log leftovers. The attempt was saved in the audit trail.");
-    await safelyHandleReadOnlyAttempt("log-leftover", { ...payload, actor_role: actorRole }, warnings);
-    return res.json({ success: true, warnings });
+  if (!authState.allowed) {
+    return res.json({
+      success: true,
+      warnings,
+      saved: false,
+      stored: authState.stored,
+      storage_mode: authState.storage_mode,
+      retry_later: authState.retry_later,
+    });
+  }
+
+  if (dataMode !== "database") {
+    await saveDemoModeWrite("log-leftover", payload, warnings, authState.actor);
+    return res.json({
+      success: true,
+      warnings,
+      saved: true,
+      stored: true,
+      deferred: true,
+      storage_mode: "demo_fallback",
+    });
   }
 
   try {
@@ -480,7 +719,7 @@ app.post("/api/log-leftover", async (req, res) => {
           payload.meal_type,
           payload.date_time,
           payload.notes,
-          payload.created_by,
+          authState.actor.id,
           payload.entered_late,
           payload.conflict_flag,
         ],
@@ -504,7 +743,7 @@ app.post("/api/log-leftover", async (req, res) => {
           payload.date_time,
           payload.raw_input_text,
           payload.notes,
-          payload.created_by,
+          authState.actor.id,
           payload.entered_late,
           payload.conflict_flag,
         ],
@@ -512,8 +751,8 @@ app.post("/api/log-leftover", async (req, res) => {
 
       await rebuildCostTrackingForDate(client, toDateKey(payload.date_time));
       await insertActivityLog(client, {
-        actor_user_id: payload.created_by,
-        actor_role: actorRole,
+        actor_user_id: authState.actor.id,
+        actor_role: authState.actor.role,
         action_type: "LOG_LEFTOVER",
         target_table: "leftover_logs",
         target_id: saved.id,
@@ -522,18 +761,18 @@ app.post("/api/log-leftover", async (req, res) => {
         warnings,
         raw_input_text: payload.raw_input_text,
         notes: payload.notes,
-        created_by: payload.created_by,
+        created_by: authState.actor.id,
         entered_late: payload.entered_late,
         conflict_flag: payload.conflict_flag,
         date_time: payload.date_time,
       });
     });
 
-    return res.json({ success: true, warnings });
+    return res.json({ success: true, warnings, saved: true });
   } catch (error) {
     addWarning(warnings, "server_storage_deferred", "Database save failed, so the payload was written to the server fallback queue.");
     await appendFallback("log-leftover", req.body, warnings, error.message);
-    return res.json({ success: true, warnings });
+    return res.json({ success: true, warnings, saved: true, deferred: true });
   }
 });
 
@@ -550,13 +789,30 @@ app.post("/api/stock-count", async (req, res) => {
     entered_late: Boolean(req.body.entered_late),
     conflict_flag: Boolean(req.body.conflict_flag),
   };
-  const actorRole = inferUserRole(payload.created_by, req.body.actor_role);
   const warnings = buildCommonWarnings(payload);
+  const authState = await resolveAuthorizedInput(req, "stock-count", payload, warnings);
 
-  if (!isInputRoleAllowed("stock-count", actorRole)) {
-    addWarning(warnings, "role_warning", "Only the storekeeper can perform stock counts. The attempt was saved in the audit trail.");
-    await safelyHandleReadOnlyAttempt("stock-count", { ...payload, actor_role: actorRole }, warnings);
-    return res.json({ success: true, warnings });
+  if (!authState.allowed) {
+    return res.json({
+      success: true,
+      warnings,
+      saved: false,
+      stored: authState.stored,
+      storage_mode: authState.storage_mode,
+      retry_later: authState.retry_later,
+    });
+  }
+
+  if (dataMode !== "database") {
+    await saveDemoModeWrite("stock-count", payload, warnings, authState.actor);
+    return res.json({
+      success: true,
+      warnings,
+      saved: true,
+      stored: true,
+      deferred: true,
+      storage_mode: "demo_fallback",
+    });
   }
 
   try {
@@ -585,7 +841,7 @@ app.post("/api/stock-count", async (req, res) => {
           payload.meal_type,
           payload.date_time,
           payload.notes,
-          payload.created_by,
+          authState.actor.id,
           payload.entered_late,
           payload.conflict_flag,
         ],
@@ -609,7 +865,7 @@ app.post("/api/stock-count", async (req, res) => {
           payload.date_time,
           payload.raw_input_text,
           payload.notes,
-          payload.created_by,
+          authState.actor.id,
           payload.entered_late,
           payload.conflict_flag,
         ],
@@ -638,8 +894,8 @@ app.post("/api/stock-count", async (req, res) => {
       }
 
       await insertActivityLog(client, {
-        actor_user_id: payload.created_by,
-        actor_role: actorRole,
+        actor_user_id: authState.actor.id,
+        actor_role: authState.actor.role,
         action_type: "STOCK_COUNT",
         target_table: "stock_counts",
         target_id: saved.id,
@@ -648,18 +904,104 @@ app.post("/api/stock-count", async (req, res) => {
         warnings,
         raw_input_text: payload.raw_input_text,
         notes: payload.notes,
-        created_by: payload.created_by,
+        created_by: authState.actor.id,
         entered_late: payload.entered_late,
         conflict_flag: payload.conflict_flag,
         date_time: payload.date_time,
       });
     });
 
-    return res.json({ success: true, warnings });
+    return res.json({ success: true, warnings, saved: true });
   } catch (error) {
     addWarning(warnings, "server_storage_deferred", "Database save failed, so the payload was written to the server fallback queue.");
     await appendFallback("stock-count", req.body, warnings, error.message);
-    return res.json({ success: true, warnings });
+    return res.json({ success: true, warnings, saved: true, deferred: true });
+  }
+});
+
+app.post("/api/student-count", async (req, res) => {
+  const payload = {
+    student_count: req.body.student_count ?? req.body.count ?? null,
+    meal_type: normalizeMealType(req.body.meal_type || "ALL"),
+    date_time: req.body.date_time || new Date().toISOString(),
+    raw_input_text: req.body.raw_input_text || null,
+    notes: req.body.notes || null,
+    created_by: req.body.created_by ?? req.body.actor_user_id ?? null,
+    entered_late: Boolean(req.body.entered_late),
+    conflict_flag: Boolean(req.body.conflict_flag),
+  };
+  const warnings = buildStudentCountWarnings(payload);
+  const authState = await resolveAuthorizedInput(req, "student-count", payload, warnings);
+
+  if (!authState.allowed) {
+    return res.json({
+      success: true,
+      warnings,
+      saved: false,
+      stored: authState.stored,
+      storage_mode: authState.storage_mode,
+      retry_later: authState.retry_later,
+    });
+  }
+
+  if (dataMode !== "database") {
+    await saveDemoModeWrite("student-count", payload, warnings, authState.actor);
+    return res.json({
+      success: true,
+      warnings,
+      saved: true,
+      stored: true,
+      deferred: true,
+      storage_mode: "demo_fallback",
+    });
+  }
+
+  try {
+    await withTransaction(async (client) => {
+      const studentCount = safeNumber(payload.student_count);
+      const countDate = toDateKey(payload.date_time);
+      const insertResult = await client.query(
+        `INSERT INTO student_counts (
+          count_date, date_time, meal_type, student_count, raw_input_text,
+          notes, created_by, entered_late, conflict_flag
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+        RETURNING *`,
+        [
+          countDate,
+          payload.date_time,
+          payload.meal_type,
+          studentCount,
+          payload.raw_input_text,
+          payload.notes,
+          authState.actor.id,
+          payload.entered_late,
+          payload.conflict_flag,
+        ],
+      );
+
+      await insertActivityLog(client, {
+        actor_user_id: authState.actor.id,
+        actor_role: authState.actor.role,
+        action_type: "STUDENT_COUNT",
+        target_table: "student_counts",
+        target_id: insertResult.rows[0]?.id ?? null,
+        status: "saved",
+        payload: req.body,
+        warnings,
+        raw_input_text: payload.raw_input_text,
+        notes: payload.notes,
+        created_by: authState.actor.id,
+        entered_late: payload.entered_late,
+        conflict_flag: payload.conflict_flag,
+        date_time: payload.date_time,
+      });
+    });
+
+    return res.json({ success: true, warnings, saved: true });
+  } catch (error) {
+    addWarning(warnings, "server_storage_deferred", "Database save failed, so the payload was written to the server fallback queue.");
+    await appendFallback("student-count", req.body, warnings, error.message);
+    return res.json({ success: true, warnings, saved: true, deferred: true });
   }
 });
 

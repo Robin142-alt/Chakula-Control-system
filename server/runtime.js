@@ -1,10 +1,12 @@
 import "dotenv/config";
+import { isDefaultSessionSecret } from "./auth.js";
 import { hasDatabaseUrl, pingDatabase } from "./db.js";
 
 export function evaluateRuntimeStatus({
   dataMode,
   hasDatabaseUrlConfigured,
   databasePing = null,
+  sessionSecretIsDefault = isDefaultSessionSecret,
   port = Number(process.env.PORT || 3001),
   nodeEnv = process.env.NODE_ENV || "development",
 }) {
@@ -39,12 +41,23 @@ export function evaluateRuntimeStatus({
     });
   }
 
+  if (sessionSecretIsDefault) {
+    warnings.push({
+      code: "default_session_secret",
+      message: "SESSION_SECRET is using the demo fallback. Set a private value before production use.",
+      severity: requiresDatabase ? "high" : "medium",
+    });
+  }
+
   return {
     ready,
     data_mode: dataMode,
     node_env: nodeEnv,
     port,
     database,
+    auth: {
+      session_secret_default: sessionSecretIsDefault,
+    },
     warnings,
   };
 }

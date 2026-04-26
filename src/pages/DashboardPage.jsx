@@ -68,12 +68,20 @@ export default function DashboardPage({
               <button className="quick-action" type="button" onClick={() => onNavigate("stock-count")}>
                 Stock count
               </button>
+              <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("backfill-import")}>
+                Backfill CSV
+              </button>
             </>
           )}
           {activeUser.role === "COOK" && (
-            <button className="quick-action" type="button" onClick={() => onNavigate("log-leftovers")}>
-              Log leftovers
-            </button>
+            <>
+              <button className="quick-action" type="button" onClick={() => onNavigate("log-leftovers")}>
+                Log leftovers
+              </button>
+              <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("backfill-import")}>
+                Backfill CSV
+              </button>
+            </>
           )}
           <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("reports")}>
             View reports
@@ -110,4 +118,3 @@ export default function DashboardPage({
     </section>
   );
 }
-

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-26T00:13:08.178Z",
+  "generated_at": "2026-04-26T01:17:53.783Z",
   "seven_day_summary": [
     {
       "date": "2026-04-20",
@@ -183,7 +183,7 @@
       ],
       "alerts": [
         {
-          "id": 8006,
+          "id": 8008,
           "alert_type": "missing_leftover",
           "severity": "MEDIUM",
           "title": "No leftovers logged for dinner",
@@ -384,7 +384,7 @@
       ],
       "alerts": [
         {
-          "id": 8003,
+          "id": 8005,
           "alert_type": "duplicate_issue",
           "severity": "HIGH",
           "title": "Beans issued twice",
@@ -585,7 +585,7 @@
       ],
       "alerts": [
         {
-          "id": 8005,
+          "id": 8007,
           "alert_type": "missing_leftover",
           "severity": "MEDIUM",
           "title": "No leftovers logged for lunch",
@@ -968,7 +968,43 @@
       ],
       "alerts": [
         {
+          "id": 8003,
+          "alert_type": "abnormal_consumption",
+          "severity": "HIGH",
+          "title": "lunch consumption out of range",
+          "message": "Actual cost was KES 3467.98 against expected KES 4549.5 on 2026-04-24.",
+          "item_id": null,
+          "meal_type": "LUNCH",
+          "status": "OPEN",
+          "source_record_type": "expected_usage",
+          "source_record_id": null,
+          "date_time": "2026-04-24T23:00:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "Actual cost was KES 3467.98 against expected KES 4549.5 on 2026-04-24.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        },
+        {
           "id": 8004,
+          "alert_type": "abnormal_consumption",
+          "severity": "HIGH",
+          "title": "dinner consumption out of range",
+          "message": "Actual cost was KES 3991.3 against expected KES 5153.4 on 2026-04-24.",
+          "item_id": null,
+          "meal_type": "DINNER",
+          "status": "OPEN",
+          "source_record_type": "expected_usage",
+          "source_record_id": null,
+          "date_time": "2026-04-24T23:00:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "Actual cost was KES 3991.3 against expected KES 5153.4 on 2026-04-24.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        },
+        {
+          "id": 8006,
           "alert_type": "missing_leftover",
           "severity": "MEDIUM",
           "title": "No leftovers logged for breakfast",
@@ -981,6 +1017,24 @@
           "date_time": "2026-04-24T06:40:00+03:00",
           "raw_input_text": "System-generated alert",
           "notes": "No leftovers were logged for breakfast on 2026-04-24.",
+          "created_by": 5,
+          "entered_late": false,
+          "conflict_flag": false
+        },
+        {
+          "id": 8009,
+          "alert_type": "abnormal_consumption",
+          "severity": "LOW",
+          "title": "breakfast consumption out of range",
+          "message": "Actual cost was KES 397.8 against expected KES 489.6 on 2026-04-24.",
+          "item_id": null,
+          "meal_type": "BREAKFAST",
+          "status": "OPEN",
+          "source_record_type": "expected_usage",
+          "source_record_id": null,
+          "date_time": "2026-04-24T23:00:00+03:00",
+          "raw_input_text": "System-generated alert",
+          "notes": "Actual cost was KES 397.8 against expected KES 489.6 on 2026-04-24.",
           "created_by": 5,
           "entered_late": false,
           "conflict_flag": false
@@ -1396,7 +1450,7 @@
     "alerts": [
       "Cooking oil variance detected",
       "Beans variance detected",
-      "Beans issued twice"
+      "lunch consumption out of range"
     ]
   }
 }

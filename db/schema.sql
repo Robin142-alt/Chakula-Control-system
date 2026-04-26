@@ -3,6 +3,10 @@ CREATE TABLE IF NOT EXISTS users (
   full_name TEXT,
   role TEXT,
   display_name TEXT,
+  pin_label TEXT,
+  pin_hash TEXT,
+  must_rotate_pin BOOLEAN DEFAULT FALSE,
+  last_login_at TIMESTAMPTZ,
   phone_number TEXT,
   is_active BOOLEAN DEFAULT TRUE,
   raw_input_text TEXT,
@@ -13,6 +17,11 @@ CREATE TABLE IF NOT EXISTS users (
   entered_late BOOLEAN DEFAULT FALSE,
   conflict_flag BOOLEAN DEFAULT FALSE
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_label TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_hash TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS must_rotate_pin BOOLEAN DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS inventory_items (
   id BIGSERIAL PRIMARY KEY,
@@ -257,4 +266,3 @@ CREATE INDEX IF NOT EXISTS idx_expected_usage_date_time ON expected_usage (date_
 CREATE INDEX IF NOT EXISTS idx_expected_usage_meal_type ON expected_usage (meal_type);
 CREATE INDEX IF NOT EXISTS idx_student_counts_date_time ON student_counts (date_time);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_date_time ON activity_logs (date_time);
-

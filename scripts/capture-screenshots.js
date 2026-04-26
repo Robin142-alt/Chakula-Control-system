@@ -34,6 +34,18 @@ async function launchBrowser() {
   }
 }
 
+async function loginAs(page, userId, pin) {
+  await page.getByLabel("Account").selectOption(String(userId));
+  await page.getByLabel("PIN").fill(pin);
+  await page.getByRole("button", { name: /^sign in$/i }).click();
+  await page.getByRole("button", { name: /sign out/i }).waitFor({ timeout: 15000 });
+}
+
+async function signOut(page) {
+  await page.getByRole("button", { name: /sign out/i }).click();
+  await page.getByRole("button", { name: /^sign in$/i }).waitFor({ timeout: 15000 });
+}
+
 await mkdir(screenshotsDir, { recursive: true });
 
 const serverProcess = spawn(
@@ -59,6 +71,7 @@ try {
   });
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
+  await loginAs(page, 1, "2048");
   await page.addStyleTag({
     content: `
       .bottom-nav { display: none !important; }
@@ -71,14 +84,22 @@ try {
   await page.waitForLoadState("networkidle");
   await page.screenshot({ path: resolve(screenshotsDir, "02-issue-stock.png"), fullPage: true });
 
-  await page.getByLabel("Active user").selectOption("2");
+  await signOut(page);
+  await loginAs(page, 1, "2048");
+  await page.getByRole("button", { name: /backfill csv/i }).first().click();
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: resolve(screenshotsDir, "03-backfill-import.png"), fullPage: true });
+
+  await signOut(page);
+  await loginAs(page, 2, "1122");
   await page.getByRole("button", { name: /log leftovers/i }).click();
   await page.waitForLoadState("networkidle");
-  await page.screenshot({ path: resolve(screenshotsDir, "03-cook-leftovers.png"), fullPage: true });
+  await page.screenshot({ path: resolve(screenshotsDir, "04-cook-leftovers.png"), fullPage: true });
 
-  await page.getByLabel("Active user").selectOption("4");
+  await signOut(page);
+  await loginAs(page, 4, "4455");
   await page.waitForLoadState("networkidle");
-  await page.screenshot({ path: resolve(screenshotsDir, "04-principal-view.png"), fullPage: true });
+  await page.screenshot({ path: resolve(screenshotsDir, "05-principal-view.png"), fullPage: true });
 
   await browser.close();
   console.log(`Saved demo screenshots to ${screenshotsDir}`);

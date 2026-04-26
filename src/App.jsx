@@ -5,15 +5,22 @@ import LeftoversPage from "./pages/LeftoversPage.jsx";
 import InventoryPage from "./pages/InventoryPage.jsx";
 import StockCountPage from "./pages/StockCountPage.jsx";
 import ReportsPage from "./pages/ReportsPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import BackfillImportPage from "./pages/BackfillImportPage.jsx";
 import { ROLE_ACCESS, USERS } from "../data/demoData.js";
+import { formatAuthMode } from "./lib/authClient.js";
 import {
+  clearCurrentSession,
   flushSyncQueue,
-  getActiveUser,
+  getCurrentSession,
+  getStoredUsers,
   loadAppSnapshot,
+  loginWithPin,
   requestBackgroundSync,
+  saveEntriesLocally,
   saveEntryLocally,
   seedKitchenDb,
-  setActiveUser,
+  syncUsersFromApi,
 } from "./lib/offlineStore.js";
 
 const DEFAULT_PAGE = {
@@ -24,8 +31,16 @@ const DEFAULT_PAGE = {
   ADMIN: "dashboard",
 };
 
+function joinWarnings(warnings = []) {
+  return warnings
+    .map((warning) => warning.message || warning)
+    .filter(Boolean)
+    .join(" ");
+}
+
 export default function App() {
-  const [activeUser, setCurrentUser] = useState(USERS[0]);
+  const [session, setSession] = useState(null);
+  const [availableUsers, setAvailableUsers] = useState(USERS);
   const [activePage, setActivePage] = useState("dashboard");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [syncing, setSyncing] = useState(false);
@@ -40,12 +55,26 @@ export default function App() {
     last_sync_at: null,
   });
 
-  const allowedPages = useMemo(() => ROLE_ACCESS[activeUser.role] || [DEFAULT_PAGE[activeUser.role]], [activeUser.role]);
+  const activeUser = session?.user || null;
+  const allowedPages = useMemo(
+    () => (activeUser ? ROLE_ACCESS[activeUser.role] || [DEFAULT_PAGE[activeUser.role]] : []),
+    [activeUser],
+  );
 
-  const refreshSnapshot = async () => {
+  const refreshAppState = async ({ syncRemoteUsers = navigator.onLine } = {}) => {
     await seedKitchenDb();
-    const [savedUser, appSnapshot] = await Promise.all([getActiveUser(), loadAppSnapshot()]);
-    setCurrentUser(savedUser);
+    if (syncRemoteUsers) {
+      await syncUsersFromApi().catch(() => {});
+    }
+
+    const [storedSession, storedUsers, appSnapshot] = await Promise.all([
+      getCurrentSession(),
+      getStoredUsers(),
+      loadAppSnapshot(),
+    ]);
+
+    setSession(storedSession);
+    setAvailableUsers(storedUsers.length ? storedUsers : USERS);
     setSnapshot(appSnapshot);
   };
 
@@ -57,9 +86,11 @@ export default function App() {
     setSyncing(true);
     try {
       const result = await flushSyncQueue();
-      await refreshSnapshot();
+      await refreshAppState({ syncRemoteUsers: false });
       if (result.synced_count) {
         setFeedback(`Saved locally and synced ${result.synced_count} record${result.synced_count === 1 ? "" : "s"} to Neon.`);
+      } else if (result.warnings.length) {
+        setFeedback(joinWarnings(result.warnings));
       }
     } finally {
       setSyncing(false);
@@ -67,12 +98,13 @@ export default function App() {
   };
 
   useEffect(() => {
-    refreshSnapshot();
+    refreshAppState();
   }, []);
 
   useEffect(() => {
     const handleOnline = async () => {
       setIsOnline(true);
+      await refreshAppState({ syncRemoteUsers: true });
       await runSync();
     };
     const handleOffline = () => setIsOnline(false);
@@ -94,31 +126,76 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!allowedPages.includes(activePage)) {
+    if (activeUser && !allowedPages.includes(activePage)) {
       setActivePage(DEFAULT_PAGE[activeUser.role] || "dashboard");
     }
-  }, [activePage, activeUser.role, allowedPages]);
+  }, [activePage, activeUser, allowedPages]);
 
-  const handleUserChange = async (userId) => {
-    await setActiveUser(userId);
-    const user = USERS.find((entry) => entry.id === Number(userId)) || USERS[0];
-    setCurrentUser(user);
-    setActivePage(DEFAULT_PAGE[user.role] || "dashboard");
+  const handleLogin = async ({ userId, pin }) => {
+    const result = await loginWithPin({ userId, pin });
+    if (!result.success) {
+      setFeedback(joinWarnings(result.warnings));
+      return;
+    }
+
+    setFeedback(joinWarnings(result.warnings) || `Signed in as ${result.session.user.display_name}.`);
+    await refreshAppState({ syncRemoteUsers: navigator.onLine });
+    setActivePage(DEFAULT_PAGE[result.session.user.role] || "dashboard");
+    if (navigator.onLine) {
+      await runSync();
+    }
+  };
+
+  const handleLogout = async () => {
+    await clearCurrentSession();
+    await refreshAppState({ syncRemoteUsers: false });
+    setActivePage("dashboard");
+    setFeedback("Signed out. Another staff member can sign in now.");
   };
 
   const handleSave = async (storeName, endpoint, payload, successMessage) => {
-    const result = await saveEntryLocally(storeName, endpoint, payload);
+    const result = await saveEntryLocally(storeName, endpoint, payload, session);
     setFeedback(
       result.warnings.length
         ? `${successMessage} Warnings: ${result.warnings.join(" ")}`
         : `${successMessage} Saved on this device first.`,
     );
     await requestBackgroundSync().catch(() => {});
-    await refreshSnapshot();
+    await refreshAppState({ syncRemoteUsers: false });
     if (navigator.onLine) {
       runSync();
     }
   };
+
+  const handleImport = async (entries) => {
+    const results = await saveEntriesLocally(entries, session);
+    const warnings = results.flatMap((result) => result.warnings || []);
+    setFeedback(
+      warnings.length
+        ? `Imported ${results.length} row${results.length === 1 ? "" : "s"} locally. Warnings: ${warnings.join(" ")}`
+        : `Imported ${results.length} row${results.length === 1 ? "" : "s"} into the local queue.`,
+    );
+    await requestBackgroundSync().catch(() => {});
+    await refreshAppState({ syncRemoteUsers: false });
+    if (navigator.onLine) {
+      runSync();
+    }
+
+    return {
+      importedCount: results.length,
+    };
+  };
+
+  if (!activeUser) {
+    return (
+      <LoginPage
+        users={availableUsers}
+        onLogin={handleLogin}
+        isOnline={isOnline}
+        feedback={feedback}
+      />
+    );
+  }
 
   const pageProps = {
     activeUser,
@@ -132,16 +209,16 @@ export default function App() {
           <p className="app-title">Chakula Control</p>
           <h1>Smart Kitchen Accountability System</h1>
         </div>
-        <label className="session-picker">
-          <span>Active user</span>
-          <select value={activeUser.id} onChange={(event) => handleUserChange(event.target.value)}>
-            {USERS.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.display_name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="session-panel">
+          <div>
+            <p className="eyebrow">Signed in</p>
+            <strong>{activeUser.display_name}</strong>
+            <p className="session-note">{formatAuthMode(session.auth_mode)}</p>
+          </div>
+          <button className="secondary-button" type="button" onClick={handleLogout}>
+            Sign out
+          </button>
+        </div>
       </header>
 
       <section className="status-strip">
@@ -188,6 +265,13 @@ export default function App() {
           <StockCountPage
             {...pageProps}
             onSubmit={(payload) => handleSave("stock_counts", "/stock-count", payload, "Stock count saved.")}
+            feedback={feedback}
+          />
+        )}
+        {activePage === "backfill-import" && (
+          <BackfillImportPage
+            {...pageProps}
+            onImport={handleImport}
             feedback={feedback}
           />
         )}

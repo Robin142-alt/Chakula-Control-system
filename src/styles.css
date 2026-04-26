@@ -84,6 +84,23 @@ button {
   box-shadow: var(--shadow);
 }
 
+.session-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.session-note,
+.login-copy {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
 .session-picker select,
 .field input,
 .field textarea {
@@ -132,6 +149,11 @@ button {
   color: #8b5b08;
 }
 
+.metric-card--terracotta {
+  background: var(--terracotta-soft);
+  color: var(--terracotta);
+}
+
 .status-pill--low,
 .metric-card--slate,
 .alert-card--low {
@@ -161,6 +183,10 @@ button {
   padding: 0.9rem 1rem;
   border-radius: 1rem;
   color: var(--green);
+}
+
+.feedback-banner--tight {
+  margin-bottom: 0;
 }
 
 .app-main,
@@ -220,6 +246,12 @@ button {
 .panel {
   padding: 1rem;
   border-radius: 1.3rem;
+}
+
+.panel--nested {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px dashed var(--line);
+  box-shadow: none;
 }
 
 .panel__header {
@@ -305,6 +337,15 @@ button {
   background: #8b5b08;
 }
 
+.secondary-button {
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface-strong);
+  color: var(--text);
+  font-weight: 700;
+}
+
 .feedback-line,
 .empty-state,
 .inventory-card__note {
@@ -352,6 +393,20 @@ button {
 .alert-stack {
   display: grid;
   gap: 0.75rem;
+}
+
+.warning-stack {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.warning-line {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.9rem;
+  background: #fcf4dd;
+  color: #81560a;
 }
 
 .alert-card {
@@ -404,6 +459,28 @@ button {
   font-weight: 700;
 }
 
+.login-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.login-card {
+  width: min(100%, 460px);
+  display: grid;
+  gap: 1rem;
+  padding: 1.4rem;
+  border-radius: 1.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.login-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
 @media (min-width: 720px) {
   .app-shell {
     max-width: 1080px;
@@ -428,5 +505,8 @@ button {
   .inventory-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-}
 
+  .metric-grid--import {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
