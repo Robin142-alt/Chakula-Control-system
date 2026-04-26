@@ -7,6 +7,8 @@ import StockCountPage from "./pages/StockCountPage.jsx";
 import ReportsPage from "./pages/ReportsPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import BackfillImportPage from "./pages/BackfillImportPage.jsx";
+import StudentCountPage from "./pages/StudentCountPage.jsx";
+import AuditLogPage from "./pages/AuditLogPage.jsx";
 import { ROLE_ACCESS, USERS } from "../data/demoData.js";
 import { formatAuthMode } from "./lib/authClient.js";
 import {
@@ -49,8 +51,11 @@ export default function App() {
     inventory_items: [],
     alerts: [],
     summaries: [],
+    student_counts: [],
     latest_summary: null,
     principal_snapshot: { todays_cost_kes: 0, cost_per_student_kes: 0, alerts: [] },
+    report_insights: null,
+    activity_feed: [],
     queue_count: 0,
     last_sync_at: null,
   });
@@ -261,6 +266,14 @@ export default function App() {
           />
         )}
         {activePage === "inventory" && <InventoryPage inventoryItems={snapshot.inventory_items} />}
+        {activePage === "student-count" && (
+          <StudentCountPage
+            activeUser={activeUser}
+            studentCounts={snapshot.student_counts}
+            onSubmit={(payload) => handleSave("student_counts", "/student-count", payload, "Student count saved.")}
+            feedback={feedback}
+          />
+        )}
         {activePage === "stock-count" && (
           <StockCountPage
             {...pageProps}
@@ -275,7 +288,20 @@ export default function App() {
             feedback={feedback}
           />
         )}
-        {activePage === "reports" && <ReportsPage summaries={snapshot.summaries} alerts={snapshot.alerts} />}
+        {activePage === "reports" && (
+          <ReportsPage
+            summaries={snapshot.summaries}
+            alerts={snapshot.alerts}
+            reportInsights={snapshot.report_insights}
+          />
+        )}
+        {activePage === "audit-log" && (
+          <AuditLogPage
+            activeUser={activeUser}
+            activityFeed={snapshot.activity_feed}
+            queueCount={snapshot.queue_count}
+          />
+        )}
       </main>
 
       <nav className="bottom-nav" aria-label="Main navigation">

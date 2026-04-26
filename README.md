@@ -10,6 +10,8 @@ Offline-first Smart Kitchen Accountability System built for low-resource boardin
 - Tolerant data capture that never blocks input and returns warnings instead of validation errors
 - Shared-device PIN login with online tokens and offline proof after one trusted sign-in
 - Role-shaped dashboards for Storekeeper, Cook, Accountant, Principal, and Admin
+- Dedicated daily student count capture for cost-per-student accuracy
+- Admin audit trail view built from local-first activity records
 - CSV backfill import for paper records and late entry cleanup
 - Seven-day Kenyan demo dataset with realistic items, KES pricing, anomalies, and cost outputs
 

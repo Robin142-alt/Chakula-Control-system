@@ -37,9 +37,11 @@
 - Service worker installs after first load
 - Offline indicator changes correctly
 - Storekeeper can save an issue locally
+- Storekeeper can save a student count locally
 - Cook can save a leftover locally
 - Storekeeper can import late paper rows from CSV
 - Shared-device PIN login works online, then offline on the same device
+- Admin can open the audit trail and see late-entry flags
 - Principal view shows:
   - today's cost
   - cost per student

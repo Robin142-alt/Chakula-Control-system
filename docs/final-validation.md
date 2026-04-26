@@ -30,6 +30,8 @@ Checked frontend shell successfully:
 - Manifest served `200`
 - Root HTML contained `id="root"` and `Chakula Control`
 - Shared-device login screen rendered
+- Student count screen bundled successfully
+- Admin audit trail screen bundled successfully
 - CSV backfill page bundled successfully
 
 Generated demo screenshots successfully:
@@ -39,6 +41,8 @@ Generated demo screenshots successfully:
 - `docs/screenshots/03-backfill-import.png`
 - `docs/screenshots/04-cook-leftovers.png`
 - `docs/screenshots/05-principal-view.png`
+- `docs/screenshots/06-student-count.png`
+- `docs/screenshots/07-admin-audit.png`
 
 Browser automation fallback note:
 
@@ -86,6 +90,8 @@ Runtime diagnostics note:
   - Waste estimate
   - Expected vs actual variance
   - Top alerts by severity
+  - Weekly meal watchlist
+  - Admin activity trail for who captured what
 
 - Demo data feels real:
   - Kenyan staple inventory
@@ -94,11 +100,11 @@ Runtime diagnostics note:
   - Duplicate, missing leftover, abnormal consumption, and stock mismatch cases
 
 - Role-based UI is correct:
-  - Storekeeper: issue stock, stock count, student count API, CSV backfill
+  - Storekeeper: issue stock, stock count, student count screen/API, CSV backfill
   - Cook: leftovers, CSV backfill for leftover paper logs
   - Accountant: read-only dashboard, inventory, reports
   - Principal: today's cost, cost per student, max 3 high alerts
-  - Admin: read-only visibility through dashboard/inventory/reports
+  - Admin: read-only visibility through dashboard/inventory/reports plus audit trail
 
 - Conflicts handled:
   - Duplicate local fingerprints mark `conflict_flag`

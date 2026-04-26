@@ -101,6 +101,18 @@ try {
   await page.waitForLoadState("networkidle");
   await page.screenshot({ path: resolve(screenshotsDir, "05-principal-view.png"), fullPage: true });
 
+  await signOut(page);
+  await loginAs(page, 1, "2048");
+  await page.getByRole("button", { name: /student count/i }).first().click();
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: resolve(screenshotsDir, "06-student-count.png"), fullPage: true });
+
+  await signOut(page);
+  await loginAs(page, 5, "7788");
+  await page.getByRole("button", { name: /audit trail/i }).first().click();
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: resolve(screenshotsDir, "07-admin-audit.png"), fullPage: true });
+
   await browser.close();
   console.log(`Saved demo screenshots to ${screenshotsDir}`);
 } finally {

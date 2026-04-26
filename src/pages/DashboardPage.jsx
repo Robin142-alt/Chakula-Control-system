@@ -65,6 +65,9 @@ export default function DashboardPage({
               <button className="quick-action" type="button" onClick={() => onNavigate("issue-stock")}>
                 Issue stock
               </button>
+              <button className="quick-action" type="button" onClick={() => onNavigate("student-count")}>
+                Student count
+              </button>
               <button className="quick-action" type="button" onClick={() => onNavigate("stock-count")}>
                 Stock count
               </button>
@@ -82,6 +85,11 @@ export default function DashboardPage({
                 Backfill CSV
               </button>
             </>
+          )}
+          {activeUser.role === "ADMIN" && (
+            <button className="quick-action" type="button" onClick={() => onNavigate("audit-log")}>
+              Audit trail
+            </button>
           )}
           <button className="quick-action quick-action--secondary" type="button" onClick={() => onNavigate("reports")}>
             View reports

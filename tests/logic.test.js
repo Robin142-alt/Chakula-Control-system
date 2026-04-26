@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DEMO_DATA } from "../data/demoData.js";
-import { buildInventorySnapshot } from "../data/derivedData.js";
+import { buildActivityFeed, buildInventorySnapshot, buildReportInsights } from "../data/derivedData.js";
 import {
   buildDailySummaries,
   buildPrincipalSnapshot,
@@ -71,3 +71,40 @@ test("principal snapshot limits output to top three high alerts", () => {
   assert.ok(snapshot.alerts.every((alert) => alert.severity === "HIGH"));
 });
 
+test("report insights highlight cost, waste, and missing leftover pressure points", () => {
+  const inventorySnapshot = buildInventorySnapshot(DEMO_DATA);
+  const alerts = detectAnomaliesFromRecords({
+    ...DEMO_DATA,
+    inventory_items: inventorySnapshot,
+  });
+  const summaries = buildDailySummaries({
+    ...DEMO_DATA,
+    inventory_items: inventorySnapshot,
+    alerts,
+  });
+  const insights = buildReportInsights(summaries, alerts);
+
+  assert.equal(insights.highestCostDay?.date, "2026-04-23");
+  assert.equal(insights.highestWasteDay?.date, "2026-04-23");
+  assert.ok(insights.highAlertCount >= 1);
+  assert.ok(insights.missingLeftoverCount >= 2);
+  assert.ok(insights.mealWatchlist.length >= 1);
+});
+
+test("activity feed includes input actions and system alerts", () => {
+  const inventorySnapshot = buildInventorySnapshot(DEMO_DATA);
+  const alerts = detectAnomaliesFromRecords({
+    ...DEMO_DATA,
+    inventory_items: inventorySnapshot,
+  });
+  const activityFeed = buildActivityFeed({
+    ...DEMO_DATA,
+    inventory_items: inventorySnapshot,
+    alerts,
+  });
+
+  assert.ok(activityFeed.some((record) => record.action_type === "ISSUE_STOCK"));
+  assert.ok(activityFeed.some((record) => record.action_type === "STUDENT_COUNT"));
+  assert.ok(activityFeed.some((record) => record.action_type === "SYSTEM_ALERT"));
+  assert.equal(activityFeed[0].date_time >= activityFeed[1].date_time, true);
+});

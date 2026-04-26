@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { buildInventorySnapshot } from "../../data/derivedData.js";
+import { buildActivityFeed, buildInventorySnapshot, buildReportInsights } from "../../data/derivedData.js";
 import { DEMO_DATA, USERS } from "../../data/demoData.js";
 import {
   buildDailySummaries,
@@ -389,18 +389,28 @@ export async function loadAppSnapshot() {
     alerts: uniqueAlerts,
   });
   const latestSummary = summaries[summaries.length - 1] || null;
+  const activityFeed = buildActivityFeed({
+    inventory_items: inventorySnapshot,
+    issue_logs,
+    leftover_logs,
+    stock_counts,
+    student_counts,
+    alerts: uniqueAlerts,
+  });
 
   return {
     inventory_items: inventorySnapshot,
     issue_logs: sortByDateTime(issue_logs),
     leftover_logs: sortByDateTime(leftover_logs),
     stock_counts: sortByDateTime(stock_counts),
-    student_counts,
+    student_counts: sortByDateTime(student_counts),
     expected_usage,
     alerts: uniqueAlerts,
     summaries,
     latest_summary: latestSummary,
     principal_snapshot: buildPrincipalSnapshot(latestSummary, uniqueAlerts),
+    report_insights: buildReportInsights(summaries, uniqueAlerts),
+    activity_feed: activityFeed,
     queue_count: sync_queue.length,
     last_sync_at: lastSync?.value || null,
   };
